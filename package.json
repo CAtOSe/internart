@@ -1,0 +1,19 @@
+{
+  "name": "internart-node",
+  "version": "0.0.1",
+  "description": "Internet Art Gallery",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://pi@78.57.189.220/home/pi/internart-node"
+  },
+  "author": "Paulius Jasėnas",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2"
+  }
+}
