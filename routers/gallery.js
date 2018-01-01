@@ -1,8 +1,8 @@
 var express = require('express')
 var router = express.Router()
 
-router.all('/',(req,res)=>{
-  res.render('site/landing')
+router.all('/gallery',(req,res)=>{
+  res.render('gallery/main')
 })
 
 module.exports = router
