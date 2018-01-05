@@ -72,5 +72,66 @@ router.post('/api/u/getUser', (req, res) => {
   })
 })
 
+router.post('/api/u/createUser', (req, res) => {
+  if(req.body.userData == undefined){
+    var response = {
+      status: {
+        code: 400,
+        message: "userData undefined"
+      }
+    }
+    res.setHeader('Content-Type', 'application/json')
+    res.status(response['status']['code']).send(JSON.stringify(response))
+    return
+  }
+
+  function generateID() {
+    var id = randomstring.generate(4)
+    pool.query('SELECT id FROM users WHERE id = $1', [id], (err, qres) => {
+      if(err) {
+        var response = {
+          status: {
+            code: 500,
+            message: "SQL error"
+          }
+        }
+        res.setHeader('Content-Type', 'application/json')
+        res.status(response['status']['code']).send(JSON.stringify(response))
+        return
+      }else if(qres){
+        var userData = JSON.parse(req.body.userData)
+        pool.query('INSERT INTO users(id, username, fullname, password, access) VALUES ($1, $2, $3, $4, $5)', [id, userData['username'], userData['fullname'], userData['password'], userData['access']], (err, qres) => {
+          if (err){
+            var response = {
+              status: {
+                code: 500,
+                message: "SQL error"
+              },
+              error: err
+            }
+            res.setHeader('Content-Type', 'application/json')
+            res.status(response['status']['code']).send(JSON.stringify(response))
+          }else{
+            var response = {
+              status: {
+                code: 200,
+                message: "User created"
+              },
+              data: {userID: id}
+            }
+            res.setHeader('Content-Type', 'application/json')
+            res.status(response['status']['code']).send(JSON.stringify(response))
+
+          }
+        })
+      }else{
+        generateID()
+      }
+    })
+  }
+
+  generateID()
+})
+
 
 module.exports = router
