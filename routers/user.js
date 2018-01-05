@@ -58,7 +58,7 @@ router.post('/api/u/getUser', (req, res) => {
     }else{
         var response = {
           status: {
-            code: 404,
+            code: 204,
             message: "User not found"
           }
         }
@@ -165,7 +165,7 @@ router.post('/api/u/deleteUser', (req, res) => {
     } else if (qres.rowCount == 0){
       var response = {
         status: {
-          code: 404,
+          code: 204,
           message: "User not found"
         }
       }
