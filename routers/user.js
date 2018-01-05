@@ -28,7 +28,7 @@ router.post('/api/u/getUser', (req, res) => {
       }
     }
     res.setHeader('Content-Type', 'application/json')
-    res.status(response['status']['code']).send(JSON.stringify(response))
+    res.send(JSON.stringify(response))
     return
   }
 
@@ -42,7 +42,7 @@ router.post('/api/u/getUser', (req, res) => {
         error: err
       }
       res.setHeader('Content-Type', 'application/json')
-      res.status(response['status']['code']).send(JSON.stringify(response))
+      res.send(JSON.stringify(response))
       throw err
       return
     }else if(qres.rows.length>0){
@@ -54,7 +54,7 @@ router.post('/api/u/getUser', (req, res) => {
         data: qres.rows[0]
       }
       res.setHeader('Content-Type', 'application/json')
-      res.status(response['status']['code']).send(JSON.stringify(response))
+      res.send(JSON.stringify(response))
     }else{
         var response = {
           status: {
@@ -63,7 +63,7 @@ router.post('/api/u/getUser', (req, res) => {
           }
         }
       res.setHeader('Content-Type', 'application/json')
-      res.status(response['status']['code']).send(JSON.stringify(response))
+      res.send(JSON.stringify(response))
     }
   })
 })
@@ -73,11 +73,11 @@ router.post('/api/u/createUser', (req, res) => {
     var response = {
       status: {
         code: 400,
-        message: "userData undefined"
+        message: "user data undefined"
       }
     }
     res.setHeader('Content-Type', 'application/json')
-    res.status(response['status']['code']).send(JSON.stringify(response))
+    res.send(JSON.stringify(response))
     return
   }
 
@@ -92,7 +92,7 @@ router.post('/api/u/createUser', (req, res) => {
           }
         }
         res.setHeader('Content-Type', 'application/json')
-        res.status(response['status']['code']).send(JSON.stringify(response))
+        res.send(JSON.stringify(response))
         return
       }else if(qres){
         var userData = JSON.parse(req.body.userData)
@@ -106,7 +106,7 @@ router.post('/api/u/createUser', (req, res) => {
                 }
               }
               res.setHeader('Content-Type', 'application/json')
-              res.status(response['status']['code']).send(JSON.stringify(response))
+              res.send(JSON.stringify(response))
 
             }else{
               var response = {
@@ -116,18 +116,18 @@ router.post('/api/u/createUser', (req, res) => {
                 }
               }
               res.setHeader('Content-Type', 'application/json')
-              res.status(response['status']['code']).send(JSON.stringify(response))
+              res.send(JSON.stringify(response))
             }
           }else{
             var response = {
               status: {
-                code: 200,
+                code: 201,
                 message: "User created"
               },
               data: {userID: id}
             }
             res.setHeader('Content-Type', 'application/json')
-            res.status(response['status']['code']).send(JSON.stringify(response))
+            res.send(JSON.stringify(response))
 
           }
         })

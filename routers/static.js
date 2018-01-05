@@ -15,7 +15,7 @@ router.all('/gallery',(req,res)=>{
 
 // USER
 router.get('/u/:userID',(req,res)=>{
-  res.render('user/user', {user: req.params['userID']})
+  res.render('user/user', {userID: req.params['userID']})
 })
 
 module.exports = router

@@ -3,14 +3,26 @@
 <head>
   <meta charset="utf-8">
   <title>InternArt</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
-  <% if (locals.user) {%>
-    <h1><%= user.fullname %></h1>
-    <h2>User: <%= user.username %></h1>
-    <h3>ID: <%= user.id %></h3>
-  <% } else { %>
-    <h1>User not found</h1>
-  <% } %>
+  <script>
+    var userID = <%= userID %>
+    $.ajax({
+      url: "/api/u/getUser",
+      method: "POST",
+      data: {userID: userID}
+    }).done(function(data) {
+      if (data['status']['code'] == 200){
+        $('body').append('<h1>'+data['data']['fullname']+'</h1>');
+        $('body').append('<h3>'+data['data']['username']+'</h3>');
+        $('body').append('<h3>'+data['data']['id']+'</h4>');
+      }else if (data['status']['code'] == 404){
+        $('body').append('<h1>User not found</h1>');
+      }else{
+        $('body').append('<h1>Unknown error</h1>');
+      }
+    });
+  </script>
 </body>
 </html>
