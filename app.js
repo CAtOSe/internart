@@ -1,5 +1,6 @@
 var express = require('express')
 var bodyParser = require('body-parser')
+var staticRouter = require('./routers/static');
 var site = require('./routers/site');
 var gallery = require('./routers/gallery');
 var user = require('./routers/user');
@@ -11,6 +12,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }))
 
 app.use('/assets', express.static('assets'))
+app.use('/', staticRouter)
 app.use('/', site)
 app.use('/', gallery)
 app.use('/', user)

@@ -18,10 +18,6 @@ pool.on('error', (err, client) => {
   process.exit(-1)
 })
 
-router.get('/u/:userID',(req,res)=>{
-  res.render('user/user', {user: req.params['userID']})
-})
-
 
 router.post('/api/u/getUser', (req, res) => {
   if(req.body.userID == undefined){
