@@ -140,5 +140,48 @@ router.post('/api/u/createUser', (req, res) => {
   generateID()
 })
 
+router.post('/api/u/deleteUser', (req, res) => {
+  if(req.body.userID == undefined){
+    var response = {
+      status: {
+        code: 400,
+        message: "userID undefined"
+      }
+    }
+    res.setHeader('Content-Type', 'application/json')
+    res.send(JSON.stringify(response))
+    return
+  }
+  pool.query('DELETE FROM users WHERE id = $1', [req.body.userID], (err, qres) => {
+    if (err){
+      var response = {
+        status: {
+          code: 500,
+          message: "SQL error"
+        }
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.stringify(response))
+    } else if (qres.rowCount == 0){
+      var response = {
+        status: {
+          code: 404,
+          message: "User not found"
+        }
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.stringify(response))
+    }else if (qres.rowCount > 0){
+      var response = {
+        status: {
+          code: 200,
+          message: "User deleted"
+        }
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.stringify(response))
+    }
+  })
+})
 
 module.exports = router
