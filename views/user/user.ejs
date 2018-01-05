@@ -1,10 +1,16 @@
+<!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>InternArt</title>
 </head>
 <body>
-  <h1><%= user.fullname %></h1>
-  <h2>User: <%= user.username %></h1>
-  <h3>ID: <%= user.id %></h3>
+  <% if (locals.user) {%>
+    <h1><%= user.fullname %></h1>
+    <h2>User: <%= user.username %></h1>
+    <h3>ID: <%= user.id %></h3>
+  <% } else { %>
+    <h1>User not found</h1>
+  <% } %>
 </body>
 </html>

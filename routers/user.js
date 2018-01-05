@@ -1,5 +1,7 @@
 var args = process.argv.slice(2);
 var express = require('express')
+var bodyParser = require('body-parser')
+var randomstring = require('randomstring')
 var router = express.Router()
 
 const { Pool } = require('pg');
@@ -16,20 +18,59 @@ pool.on('error', (err, client) => {
   process.exit(-1)
 })
 
-router.all('/u/:userID',(req,res)=>{
-  pool.query('SELECT * FROM users WHERE id = $1', [req.params['userID']], (err, qres) => {
+router.get('/u/:userID',(req,res)=>{
+  res.render('user/user', {user: req.params['userID']})
+})
+
+
+router.post('/api/u/getUser', (req, res) => {
+  if(req.body.userID == undefined){
+    var response = {
+      status: {
+        code: 400,
+        message: "UserID undefined"
+      }
+    }
+    res.setHeader('Content-Type', 'application/json')
+    res.status(response['status']['code']).send(JSON.stringify(response))
+    return
+  }
+
+  pool.query('SELECT id, username, fullname, access FROM users WHERE id = $1', [req.body.userID], (err, qres) => {
     if (err) {
+      var response = {
+        status: {
+          code: 500,
+          message: "SQL error"
+        },
+        error: err
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.status(response['status']['code']).send(JSON.stringify(response))
       throw err
+      return
+    }else if(qres.rows.length>0){
+      var response = {
+        status: {
+          code: 200,
+          message: "User found"
+        },
+        data: qres.rows[0]
+      }
+      res.setHeader('Content-Type', 'application/json')
+      res.status(response['status']['code']).send(JSON.stringify(response))
+    }else{
+        var response = {
+          status: {
+            code: 404,
+            message: "User not found"
+          }
+        }
+      res.setHeader('Content-Type', 'application/json')
+      res.status(response['status']['code']).send(JSON.stringify(response))
     }
-
-    var user = {
-      username: qres.rows[0]['username'],
-      fullname: qres.rows[0]['fullname'],
-      id: req.params['userID']
-    }
-
-    res.render('user/user', {user: user})
   })
 })
+
 
 module.exports = router
