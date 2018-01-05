@@ -102,15 +102,26 @@ router.post('/api/u/createUser', (req, res) => {
         var userData = JSON.parse(req.body.userData)
         pool.query('INSERT INTO users(id, username, fullname, password, access) VALUES ($1, $2, $3, $4, $5)', [id, userData['username'], userData['fullname'], userData['password'], userData['access']], (err, qres) => {
           if (err){
-            var response = {
-              status: {
-                code: 500,
-                message: "SQL error"
-              },
-              error: err
+            if (err['detail'].includes('already exists')){
+              var response = {
+                status: {
+                  code: 400,
+                  message: "User already exists"
+                }
+              }
+              res.setHeader('Content-Type', 'application/json')
+              res.status(response['status']['code']).send(JSON.stringify(response))
+
+            }else{
+              var response = {
+                status: {
+                  code: 500,
+                  message: "SQL error"
+                }
+              }
+              res.setHeader('Content-Type', 'application/json')
+              res.status(response['status']['code']).send(JSON.stringify(response))
             }
-            res.setHeader('Content-Type', 'application/json')
-            res.status(response['status']['code']).send(JSON.stringify(response))
           }else{
             var response = {
               status: {
