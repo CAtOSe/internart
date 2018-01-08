@@ -1,9 +1,12 @@
 var express = require('express')
 var bodyParser = require('body-parser')
+var flash = require('connect-flash');
+
 var staticRouter = require('./routers/static');
 var site = require('./routers/site');
 var gallery = require('./routers/gallery');
 var user = require('./routers/user');
+
 var app = express()
 app.set('view engine', 'ejs')
 app.use(bodyParser.json() );       // to support JSON-encoded bodies
