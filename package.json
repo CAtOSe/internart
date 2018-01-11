@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://pi@78.57.189.220/home/pi/internart-node"
+    "url": "ssh://git@78.57.189.220/home/git/internart-node"
   },
   "author": "Paulius Jasėnas",
   "license": "MIT",
