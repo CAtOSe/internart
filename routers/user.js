@@ -10,10 +10,10 @@ var router = express.Router()
 
 const { Pool } = require('pg');
 const pool = new Pool({
-  user: 'postgres',
+  user: args[1],
   host: args[0],
-  password: args[1],
-  database: 'test',
+  password: args[2],
+  database: 'internart',
   port: '5432'
 })
 
@@ -71,6 +71,8 @@ router.post('/api/u/getUser', (req, res) => {
     }
   })
 })
+
+
 
 router.post('/api/u/createUser', (req, res) => {
   if(req.body.userData == undefined){
@@ -144,6 +146,9 @@ router.post('/api/u/createUser', (req, res) => {
   generateID()
 })
 
+
+
+
 router.post('/api/u/deleteUser', (req, res) => {
   if(req.body.userID == undefined){
     var response = {
@@ -190,7 +195,7 @@ router.post('/api/u/deleteUser', (req, res) => {
 
 router.post('u/login', (req, res) => {
   if(req.body.loginName == undefined || req.body.loginPassword == undefined){
-    
+
   }
 })
 
