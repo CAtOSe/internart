@@ -1,7 +1,11 @@
 var args = process.argv.slice(2);
 var express = require('express')
-var bodyParser = require('body-parser')
 var randomstring = require('randomstring')
+var passport = require('passport')
+var session = require('express-session')
+var cookieParser = require('cookie-parser')
+var bodyParser = require('body-parser')
+var flash = require('connect-flash')
 var router = express.Router()
 
 const { Pool } = require('pg');
@@ -182,6 +186,12 @@ router.post('/api/u/deleteUser', (req, res) => {
       res.send(JSON.stringify(response))
     }
   })
+})
+
+router.post('u/login', (req, res) => {
+  if(req.body.loginName == undefined || req.body.loginPassword == undefined){
+    
+  }
 })
 
 module.exports = router

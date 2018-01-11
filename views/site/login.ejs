@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>InternArt | Login</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login">
+    <input type="text" name="loginName" placeholder="Login Name" /><br />
+    <input type="password" name="loginPassword" placeholder="Password" /> <br />
+    <input type="submit" value="Login" />
+  </form>
+  
+  <script>
+    $('#login').on('submit', function(e){
+      e.preventDefault();
+      $.ajax({
+        url: "/api/u/login",
+        method: "POST",
+        data: {
+          loginName: $('#login > input[name=loginName]').val(),
+          loginPassword: $('#login > input[name=loginPassword]').val()
+        }
+      }).done(function(data) {
+        console.log(data);
+      });
+    });
+  </script>
+</body>
+</html>
