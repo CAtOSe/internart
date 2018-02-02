@@ -57,8 +57,12 @@ app.all('/api/*', (req, res) => {
   res.status(response['status']['code']).send(JSON.stringify(response))
 })
 
-app.all('*', (req, res) => {
+app.get('*', (req, res) => {
   res.status(404).render('404');
+})
+
+app.all('*', (req, res) => {
+  res.status(404).send("404")
 })
 
 app.listen(80, (req, res) => {
