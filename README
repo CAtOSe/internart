@@ -7,8 +7,8 @@ Running:
 $ node app.js <database host> <database user> <database password>
 ```
 
-Notes:
-* Very under development
-* Even more under development
+TODO:
+* Authentication
 
+---
 2018
