@@ -1,4 +1,4 @@
-module.exports = function(app, passport, pool){
+module.exports = function(app, pool){
 
   app.post('/api/u/getUser', (req, res) => {
     if(req.body.userID == undefined){

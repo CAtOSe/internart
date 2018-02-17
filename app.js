@@ -1,10 +1,6 @@
 var args = process.argv.slice(2);
 var express = require('express')
-var passport = require('passport')
-var session = require('express-session')
-var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
-var flash = require('connect-flash')
 const { Pool } = require('pg')
 
 var staticRouter = require('./routers/static')
@@ -14,17 +10,10 @@ var gallery = require('./routers/gallery')
 
 var app = express()
 app.set('view engine', 'ejs')
-app.use(cookieParser());
 app.use(bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }))
-
-
-app.use(session({ secret: 'iloveapple' }))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(flash())
 
 
 const pool = new Pool({
@@ -40,7 +29,7 @@ pool.on('error', (err, client) => {
   process.exit(-1)
 })
 
-require('./routers/user')(app, passport, pool)
+require('./routers/user')(app, pool)
 
 app.use('/assets', express.static('assets'))
 app.use('/', staticRouter)

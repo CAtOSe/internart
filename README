@@ -1,8 +1,14 @@
 InternArt
-
-A internet web art gallery
+====
+### A internet art gallery
 ---
+Running:
+```
+$ node app.js <database host> <database user> <database password>
+```
+
 Notes:
 * Very under development
+* Even more under development
 
-2017
+2018
