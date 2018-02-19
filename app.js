@@ -1,11 +1,17 @@
-var args = process.argv.slice(2);
-var express = require('express')
-var bodyParser = require('body-parser')
+const args = process.argv.slice(2);
+const express = require('express')
+const session = require('express-session')
+const bodyParser = require('body-parser')
 const { Pool } = require('pg')
+const pgSession = require('connect-pg-simple')(session);
+var passport = require('passport')
+var Strategy = require('passport-local').Strategy
 
-var staticRouter = require('./routers/static')
-var site = require('./routers/site')
-var gallery = require('./routers/gallery')
+const staticRouter = require('./routers/static')
+const site = require('./routers/site')
+const gallery = require('./routers/gallery')
+
+const userAPI = require('./apis/user')
 
 
 var app = express()
@@ -14,7 +20,6 @@ app.use(bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }))
-
 
 const pool = new Pool({
   user: args[1],
@@ -29,7 +34,29 @@ pool.on('error', (err, client) => {
   process.exit(-1)
 })
 
-require('./routers/user')(app, pool)
+app.use(session({
+  store: new pgSession({
+    pool : pool,                // Connection pool
+    tableName : 'user_sessions'   // Use another table-name than the default "session" one
+  }),
+  secret: 'ilovepc',
+  resave: false,
+  saveUninitialized: true
+}))
+
+passport.use(new Strategy(
+  function(username, password, cb) {
+    userAPI.findUserByLoginName(pool, username, (response) => {
+      if (response.status.code != 200) { return cb(response); }
+      if (response.status.code == 204) { return cb(null, false); }
+      if (response.status.data.password != password) { return cb(null, false); }
+      return cb(null, user);
+    }, true);
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+require('./routers/user')(app, passport, Strategy, pool)
 
 app.use('/assets', express.static('assets'))
 app.use('/', staticRouter)

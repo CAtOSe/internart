@@ -13,10 +13,11 @@
     <input type="password" name="loginPassword" placeholder="Password" /> <br />
     <input type="submit" value="Login" />
   </form>
-  
+
   <script>
     $('#login').on('submit', function(e){
       e.preventDefault();
+      console.log('LOGIN');
       $.ajax({
         url: "/api/u/login",
         method: "POST",
