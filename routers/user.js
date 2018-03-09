@@ -1,6 +1,6 @@
 const userAPI = require('../apis/user');
 
-module.exports = function(app, passport, Strategy, pool) {
+module.exports = function(app, pool) {
 
   app.post('/api/u/getUser', (req, res) => {
     if(req.body.userID == undefined){
@@ -14,6 +14,7 @@ module.exports = function(app, passport, Strategy, pool) {
       res.send(JSON.stringify(response))
       return
     }
+
     userAPI.findUserByID(pool, req.body.userID, (response) => {
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
@@ -33,6 +34,7 @@ module.exports = function(app, passport, Strategy, pool) {
       res.send(JSON.stringify(response))
       return
     }
+
     var userData = JSON.parse(req.body.userData)
     userAPI.createUser(pool, userData, (response) => {
       res.setHeader('Content-Type', 'application/json')
@@ -53,6 +55,7 @@ module.exports = function(app, passport, Strategy, pool) {
       res.send(JSON.stringify(response))
       return
     }
+
     userAPI.deleteUser(pool, req.body.userID, (response) => {
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
@@ -72,7 +75,12 @@ module.exports = function(app, passport, Strategy, pool) {
       res.send(JSON.stringify(response))
       return
     }
-    userAPI.login(pool)
+
+    userAPI.login(pool, {'loginName':req.body.loginName, 'loginPassword':req.body.loginPassword}, (response) => {
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.stringify(response))
+      return
+    })
   })
 
 }

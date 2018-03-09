@@ -4,8 +4,6 @@ const session = require('express-session')
 const bodyParser = require('body-parser')
 const { Pool } = require('pg')
 const pgSession = require('connect-pg-simple')(session);
-var passport = require('passport')
-var Strategy = require('passport-local').Strategy
 
 const staticRouter = require('./routers/static')
 const site = require('./routers/site')
@@ -44,19 +42,7 @@ app.use(session({
   saveUninitialized: true
 }))
 
-passport.use(new Strategy(
-  function(username, password, cb) {
-    userAPI.findUserByLoginName(pool, username, (response) => {
-      if (response.status.code != 200) { return cb(response); }
-      if (response.status.code == 204) { return cb(null, false); }
-      if (response.status.data.password != password) { return cb(null, false); }
-      return cb(null, user);
-    }, true);
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-require('./routers/user')(app, passport, Strategy, pool)
+require('./routers/user')(app, pool)
 
 app.use('/assets', express.static('assets'))
 app.use('/', staticRouter)

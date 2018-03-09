@@ -38,9 +38,9 @@ module.exports.findUserByID = function (pool, userID, callback, returnPassword =
 }
 
 module.exports.findUserByLoginName = function (pool, loginName, callback, returnPassword = false) {
-  var query = 'SELECT id, email, fullname, access FROM users WHERE id = $1'
+  var query = 'SELECT id, email, fullname, access FROM users WHERE email = $1'
   if (returnPassword) {
-    query = 'SELECT id, email, fullname, access, password FROM users WHERE id = $1'
+    query = 'SELECT id, email, fullname, access, password FROM users WHERE email = $1'
   }
   pool.query(query, [loginName], (err, qres) => {
     if (err) {
@@ -157,4 +157,28 @@ module.exports.deleteUser = function(pool, userID, callback) {
       callback(response)
     }
   })
+}
+
+module.exports.login = function (pool, loginData, callback) {
+  module.exports.findUserByLoginName(pool, loginData['loginName'], (fres) => {
+    if (fres.status.code == 200) {
+      if (fres.data.password == loginData['loginPassword']) {
+        var response = {
+          status: {
+            code: 200,
+            message: "Credentials accepted"
+          }
+        }
+        callback(response)
+        return
+      }
+    }
+    var response = {
+      status: {
+        code: 204,
+        message: "Credentials denied"
+      }
+    }
+    callback(response)
+  }, true)
 }
