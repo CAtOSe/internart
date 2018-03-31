@@ -9,7 +9,7 @@ const staticRouter = require('./routers/static')
 const site = require('./routers/site')
 const gallery = require('./routers/gallery')
 
-const userAPI = require('./apis/user')
+const userAPI = require('./apis/userAPI')
 
 
 var app = express()
@@ -39,10 +39,11 @@ app.use(session({
   }),
   secret: 'ilovepc',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  secure: true
 }))
 
-require('./routers/user')(app, pool)
+require('./routers/user')(app, pool, userAPI)
 
 app.use('/assets', express.static('assets'))
 app.use('/', staticRouter)

@@ -1,6 +1,4 @@
-const userAPI = require('../apis/user');
-
-module.exports = function(app, pool) {
+module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/getUser', (req, res) => {
     if(req.body.userID == undefined){
@@ -77,6 +75,9 @@ module.exports = function(app, pool) {
     }
 
     userAPI.login(pool, {'loginName':req.body.loginName, 'loginPassword':req.body.loginPassword}, (response) => {
+      if (response.status.code == 200) {
+        req.session.userID = response.data.userID;
+      }
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
       return

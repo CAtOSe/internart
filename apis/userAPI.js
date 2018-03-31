@@ -167,6 +167,9 @@ module.exports.login = function (pool, loginData, callback) {
           status: {
             code: 200,
             message: "Credentials accepted"
+          },
+          data:{
+            userID: fres.data.id
           }
         }
         callback(response)
