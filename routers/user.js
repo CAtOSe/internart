@@ -2,7 +2,7 @@ module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/getUser', (req, res) => {
     if(req.body.userID == undefined){
-      var response = {
+      let response = {
         status: {
           code: 400,
           message: "UserID undefined"
@@ -13,7 +13,7 @@ module.exports = function(app, pool, userAPI) {
       return
     }
 
-    userAPI.findUserByID(pool, req.body.userID, (response) => {
+    userAPI.getUserByID(pool, req.body.userID, (response) => {
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
     })
@@ -22,7 +22,7 @@ module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/createUser', (req, res) => {
     if(req.body.userData == undefined){
-      var response = {
+      let response = {
         status: {
           code: 400,
           message: "User data undefined"
@@ -33,7 +33,7 @@ module.exports = function(app, pool, userAPI) {
       return
     }
 
-    var userData = JSON.parse(req.body.userData)
+    let userData = JSON.parse(req.body.userData)
     userAPI.createUser(pool, userData, (response) => {
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
@@ -43,7 +43,7 @@ module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/deleteUser', (req, res) => {
     if(req.body.userID == undefined){
-      var response = {
+      let response = {
         status: {
           code: 400,
           message: "userID undefined"
@@ -63,7 +63,7 @@ module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/login', (req, res) => {
     if(req.body.loginName == undefined || req.body.loginPassword == undefined){
-      var response = {
+      let response = {
         status: {
           code: 400,
           message: "Login info undefined"
@@ -81,6 +81,14 @@ module.exports = function(app, pool, userAPI) {
       res.setHeader('Content-Type', 'application/json')
       res.send(JSON.stringify(response))
       return
+    })
+  })
+
+  //NOTE: REMOVE THIS. THIS IS ONLY FOR DEBUGGING !!!!!!!!!!!!!!!!!!
+  app.post('/api/u/userInfo', (req, res) => {
+    userAPI.getUserByReq(pool, req, (response) => {
+      res.setHeader('Content-Type', 'application/json')
+      res.send(JSON.stringify(response))
     })
   })
 

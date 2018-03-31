@@ -26,7 +26,7 @@
           loginPassword: $('#login > input[name=loginPassword]').val()
         }
       }).done(function(data) {
-        console.log(data);
+        alert(data.status.message)
       });
     });
   </script>

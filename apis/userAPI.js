@@ -1,13 +1,14 @@
 const randomstring = require('randomstring')
+const permissions = require('./permissions');
 
-module.exports.findUserByID = function (pool, userID, callback, returnPassword = false) {
-  var query = 'SELECT id, email, fullname, access FROM users WHERE id = $1'
+module.exports.getUserByID = function (pool, userID, callback, returnPassword = false) {
+  let query = 'SELECT id, loginName, fullName, access FROM users WHERE id = $1'
   if (returnPassword) {
-    query = 'SELECT id, email, fullname, access, password FROM users WHERE id = $1'
+    query = 'SELECT id, loginName, fullName, access, password FROM users WHERE id = $1'
   }
   pool.query(query, [userID], (err, qres) => {
     if (err) {
-      var response = {
+      let response = {
         status: {
           code: 500,
           message: "SQL error"
@@ -17,7 +18,7 @@ module.exports.findUserByID = function (pool, userID, callback, returnPassword =
       throw err
       return
     }else if(qres.rows.length>0){
-      var response = {
+      let response = {
         status: {
           code: 200,
           message: "User found"
@@ -26,7 +27,7 @@ module.exports.findUserByID = function (pool, userID, callback, returnPassword =
       }
       callback(response)
     }else{
-      var response = {
+      let response = {
         status: {
           code: 204,
           message: "User not found"
@@ -37,14 +38,14 @@ module.exports.findUserByID = function (pool, userID, callback, returnPassword =
   })
 }
 
-module.exports.findUserByLoginName = function (pool, loginName, callback, returnPassword = false) {
-  var query = 'SELECT id, email, fullname, access FROM users WHERE email = $1'
+module.exports.getUserByLoginName = function (pool, loginName, callback, returnPassword = false) {
+  let query = 'SELECT id, loginName, fullname, access FROM users WHERE loginName = $1'
   if (returnPassword) {
-    query = 'SELECT id, email, fullname, access, password FROM users WHERE email = $1'
+    query = 'SELECT id, loginName, fullname, access, password FROM users WHERE loginName = $1'
   }
   pool.query(query, [loginName], (err, qres) => {
     if (err) {
-      var response = {
+      let response = {
         status: {
           code: 500,
           message: "SQL error"
@@ -54,7 +55,7 @@ module.exports.findUserByLoginName = function (pool, loginName, callback, return
       throw err
       return
     }else if(qres.rows.length>0){
-      var response = {
+      let response = {
         status: {
           code: 200,
           message: "User found"
@@ -63,7 +64,7 @@ module.exports.findUserByLoginName = function (pool, loginName, callback, return
       }
       callback(response)
     }else{
-      var response = {
+      let response = {
         status: {
           code: 204,
           message: "User not found"
@@ -76,10 +77,10 @@ module.exports.findUserByLoginName = function (pool, loginName, callback, return
 
 module.exports.createUser = function (pool, userData, callback) {
   function generateID() {
-    var id = randomstring.generate(4)
+    let id = randomstring.generate(4)
     pool.query('SELECT id FROM users WHERE id = $1', [id], (err, qres) => {
       if(err) {
-        var response = {
+        let response = {
           status: {
             code: 500,
             message: "SQL error"
@@ -90,10 +91,10 @@ module.exports.createUser = function (pool, userData, callback) {
         res.send(JSON.stringify(response))
         return
       }else if(qres){
-        pool.query('INSERT INTO users(id, email, fullname, password, access) VALUES ($1, $2, $3, $4, $5)', [id, userData['email'], userData['fullname'], userData['password'], userData['access']], (err, qres) => {
+        pool.query('INSERT INTO users(id, loginName, fullname, password, access) VALUES ($1, $2, $3, $4, $5)', [id, userData['loginName'], userData['fullname'], userData['password'], userData['access']], (err, qres) => {
           if (err){
             if (err['detail'].includes('already exists')){
-              var response = {
+              let response = {
                 status: {
                   code: 400,
                   message: "User already exists"
@@ -101,7 +102,7 @@ module.exports.createUser = function (pool, userData, callback) {
               }
               callback(response)
             }else{
-              var response = {
+              let response = {
                 status: {
                   code: 500,
                   message: "SQL error"
@@ -110,7 +111,7 @@ module.exports.createUser = function (pool, userData, callback) {
               callback(response)
             }
           }else{
-            var response = {
+            let response = {
               status: {
                 code: 201,
                 message: "User created"
@@ -132,7 +133,7 @@ module.exports.createUser = function (pool, userData, callback) {
 module.exports.deleteUser = function(pool, userID, callback) {
   pool.query('DELETE FROM users WHERE id = $1', [userID], (err, qres) => {
     if (err){
-      var response = {
+      let response = {
         status: {
           code: 500,
           message: "SQL error"
@@ -140,7 +141,7 @@ module.exports.deleteUser = function(pool, userID, callback) {
       }
       callback(response)
     } else if (qres.rowCount == 0){
-      var response = {
+      let response = {
         status: {
           code: 204,
           message: "User not found"
@@ -148,7 +149,7 @@ module.exports.deleteUser = function(pool, userID, callback) {
       }
       callback(response)
     }else if (qres.rowCount > 0){
-      var response = {
+      let response = {
         status: {
           code: 200,
           message: "User deleted"
@@ -160,28 +161,58 @@ module.exports.deleteUser = function(pool, userID, callback) {
 }
 
 module.exports.login = function (pool, loginData, callback) {
-  module.exports.findUserByLoginName(pool, loginData['loginName'], (fres) => {
+  module.exports.getUserByLoginName(pool, loginData['loginName'], (fres) => {
     if (fres.status.code == 200) {
       if (fres.data.password == loginData['loginPassword']) {
-        var response = {
-          status: {
-            code: 200,
-            message: "Credentials accepted"
-          },
-          data:{
-            userID: fres.data.id
+        if (permissions.checkPermission(fres.data.access, 'canLogin')){
+          let response = {
+            status: {
+              code: 200,
+              message: "User authenticated"
+            },
+            data:{
+              userID: fres.data.id
+            }
           }
+          callback(response)
+          return
+        } else {
+          let response = {
+            status: {
+              code: 403,
+              message: "Can not login"
+            },
+            data:{
+              userID: fres.data.id
+            }
+          }
+          callback(response)
+          return
         }
-        callback(response)
-        return
       }
     }
-    var response = {
+    let response = {
       status: {
         code: 204,
         message: "Credentials denied"
       }
     }
+    callback(response)
+  }, true)
+}
+
+module.exports.getUserByReq = function (pool, reqst, callback) {
+  if (reqst.session.userID == undefined) {
+    let response = {
+      status: {
+        code: 401,
+        message: "Not authenticated"
+      }
+    }
+    callback(response)
+    return
+  }
+  module.exports.getUserByID(pool, reqst.session.userID, (response) => {
     callback(response)
   }, true)
 }

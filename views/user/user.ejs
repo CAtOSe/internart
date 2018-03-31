@@ -15,7 +15,7 @@
     }).done(function(data) {
       if (data['status']['code'] == 200){
         $('body').append('<h1>'+data['data']['fullname']+'</h1>');
-        $('body').append('<h3>'+data['data']['username']+'</h3>');
+        $('body').append('<h3>'+data['data']['loginname']+'</h3>');
         $('body').append('<h3>'+data['data']['id']+'</h4>');
       }else if (data['status']['code'] == 404){
         $('body').append('<h1>User not found</h1>');
