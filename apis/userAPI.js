@@ -2,9 +2,9 @@ const randomstring = require('randomstring')
 const permissions = require('./permissions');
 
 module.exports.getUserByID = function (pool, userID, callback, returnPassword = false) {
-  let query = 'SELECT id, loginName, fullName, access FROM users WHERE id = $1'
+  let query = 'SELECT id, loginName, fullName, groups FROM users WHERE id = $1'
   if (returnPassword) {
-    query = 'SELECT id, loginName, fullName, access, password FROM users WHERE id = $1'
+    query = 'SELECT id, loginName, fullName, groups, password FROM users WHERE id = $1'
   }
   pool.query(query, [userID], (err, qres) => {
     if (err) {
@@ -39,9 +39,9 @@ module.exports.getUserByID = function (pool, userID, callback, returnPassword = 
 }
 
 module.exports.getUserByLoginName = function (pool, loginName, callback, returnPassword = false) {
-  let query = 'SELECT id, loginName, fullname, access FROM users WHERE loginName = $1'
+  let query = 'SELECT id, loginName, fullname, groups FROM users WHERE loginName = $1'
   if (returnPassword) {
-    query = 'SELECT id, loginName, fullname, access, password FROM users WHERE loginName = $1'
+    query = 'SELECT id, loginName, fullname, groups, password FROM users WHERE loginName = $1'
   }
   pool.query(query, [loginName], (err, qres) => {
     if (err) {
@@ -91,7 +91,7 @@ module.exports.createUser = function (pool, userData, callback) {
         res.send(JSON.stringify(response))
         return
       }else if(qres){
-        pool.query('INSERT INTO users(id, loginName, fullname, password, access) VALUES ($1, $2, $3, $4, $5)', [id, userData['loginName'], userData['fullname'], userData['password'], userData['access']], (err, qres) => {
+        pool.query('INSERT INTO users(id, loginName, fullname, password, groups) VALUES ($1, $2, $3, $4, $5)', [id, userData['loginName'], userData['fullName'], userData['password'], userData['groups']], (err, qres) => {
           if (err){
             if (err['detail'].includes('already exists')){
               let response = {
@@ -161,46 +161,68 @@ module.exports.deleteUser = function(pool, userID, callback) {
 }
 
 module.exports.login = function (pool, loginData, callback) {
-  module.exports.getUserByLoginName(pool, loginData['loginName'], (fres) => {
-    if (fres.status.code == 200) {
-      if (fres.data.password == loginData['loginPassword']) {
-        if (permissions.checkPermission(fres.data.access, 'canLogin')){
-          let response = {
-            status: {
-              code: 200,
-              message: "User authenticated"
-            },
-            data:{
-              userID: fres.data.id
+  module.exports.getUserByLoginName(pool, loginData['loginName'], (user) => {
+    if (user.status.code == 200) {
+      if (user.data.password == loginData['loginPassword']) {
+        permissions.checkUserPermission(pool, user.data.groups, 'canLogin', (perm) => {
+          if (perm.status.code == 200) {
+            if (perm.data.value == 1) {
+              let response = {
+                status: {
+                  code: 200,
+                  message: "User authenticated"
+                },
+                data:{
+                  userID: user.data.id
+                }
+              }
+              callback(response)
+              return
+            } else {
+              let response = {
+                status: {
+                  code: 403,
+                  message: "Can not login"
+                },
+                data:{
+                  userID: user.data.id
+                }
+              }
+              callback(response)
+              return
             }
-          }
-          callback(response)
-          return
-        } else {
-          let response = {
-            status: {
-              code: 403,
-              message: "Can not login"
-            },
-            data:{
-              userID: fres.data.id
+          } else {
+            let response = {
+              status: {
+                code: 500,
+                message: 'Unknown internal error'
+              },
+              data: perm
             }
+            callback(response)
           }
-          callback(response)
-          return
+        })
+      } else {
+        let response = {
+          status: {
+            code: 204,
+            message: "Credentials denied"
+          }
+        }
+        callback(response)
+      }
+    } else {
+      let response = {
+        status: {
+          code: 204,
+          message: "Credentials denied"
         }
       }
+      callback(response)
     }
-    let response = {
-      status: {
-        code: 204,
-        message: "Credentials denied"
-      }
-    }
-    callback(response)
   }, true)
 }
-
+// PROBABLY WILL BE UNUSED
 module.exports.getUserByReq = function (pool, reqst, callback) {
   if (reqst.session.userID == undefined) {
     let response = {

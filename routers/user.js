@@ -32,7 +32,6 @@ module.exports = function(app, pool, userAPI) {
       res.send(JSON.stringify(response))
       return
     }
-
     let userData = JSON.parse(req.body.userData)
     userAPI.createUser(pool, userData, (response) => {
       res.setHeader('Content-Type', 'application/json')

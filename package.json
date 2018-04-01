@@ -13,6 +13,7 @@
   "author": "Paulius Jasėnas",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.6.0",
     "bcrypt-nodejs": "latest",
     "body-parser": "^1.18.2",
     "connect-pg-simple": "^4.2.1",
