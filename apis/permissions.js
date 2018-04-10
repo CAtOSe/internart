@@ -8,10 +8,10 @@ module.exports.getGroup = function (pool, groupName, callback) {
           code: 500,
           message: "SQL error"
         }
-      }
-      callback(response)
-      throw err
-      return
+      };
+      callback(response);
+      throw err;
+      return;
     }else if(qres.rows.length>0){
       let response = {
         status: {
@@ -19,24 +19,24 @@ module.exports.getGroup = function (pool, groupName, callback) {
           message: "Group found"
         },
         data: qres.rows[0]
-      }
-      callback(response)
+      };
+      callback(response);
     }else{
       let response = {
         status: {
           code: 204,
           message: "Group not found"
         }
-      }
-      callback(response)
+      };
+      callback(response);
     }
-  })
+  });
 }
 
 module.exports.getGroupPermission = function (pool, groupName, permission, callback) {
   module.exports.getGroup(pool, groupName, (group) => {
     if (group.status.code == 200) {
-      group.data.permissions = JSON.parse(group.data.permissions)
+      group.data.permissions = JSON.parse(group.data.permissions);
       if (group.data.permissions[permission] != undefined) {
         let response = {
           status: {
@@ -48,41 +48,41 @@ module.exports.getGroupPermission = function (pool, groupName, permission, callb
             value: group.data.permissions[permission],
             priority: group.data.priority
           }
-        }
-        callback(response)
+        };
+        callback(response);
       } else {
         let response = {
           status: {
             code: 204,
             message: "Permission not found"
           }
-        }
-        callback(response)
+        };
+        callback(response);
       }
     } else {
-      callback(group)
+      callback(group);
     }
-  })
+  });
 }
 
-module.exports.checkUserPermission = function (pool, userGroups, permission, callback) {
-  userGroups = userGroups.split(',')
-  let permResult = 0
-  let permGroup = ''
-  let permPriority = -1
-  async.forEachOf(userGroups, (group, key, callback) =>{
+module.exports.checkGroupsPermission = function (pool, userGroups, permission, callback) {
+  userGroups = userGroups.split(',');
+  let permResult = 0;
+  let permGroup = '';
+  let permPriority = -1;
+  async.forEachOf(userGroups, (group, key, callback) => {
     module.exports.getGroupPermission(pool, group, permission, (perm) => {
       if (perm.status.code == 200) {
         if (perm.data.priority > permPriority) {
-          permResult = perm.data.value
-          permGroup = group
-          permPriority = perm.data.priority
+          permResult = perm.data.value;
+          permGroup = group;
+          permPriority = perm.data.priority;
         }
       } else if (perm.status.code == 204) {
       } else {
         //ERR
       }
-      callback()
+      callback();
     })
   }, (err) => {
     if (err) {
@@ -91,9 +91,8 @@ module.exports.checkUserPermission = function (pool, userGroups, permission, cal
           code: 500,
           message: 'Unknown internal error'
         }
-      }
-      console.log(err)
-      callback(response)
+      };
+      callback(response);
     } else {
       let response = {
         status: {
@@ -106,8 +105,8 @@ module.exports.checkUserPermission = function (pool, userGroups, permission, cal
           value: permResult,
           priority: permPriority
         }
-      }
-      callback(response)
+      };
+      callback(response);
     }
   })
 }
