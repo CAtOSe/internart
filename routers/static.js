@@ -3,7 +3,7 @@ var router = express.Router();
 
 // SITE
 router.get('/', (req, res) => {
-  res.render('site/landing');
+  res.render('gallery/main');
 });
 
 router.get('/login', (req, res) => {
@@ -12,10 +12,6 @@ router.get('/login', (req, res) => {
 
 
 // GALLERY
-router.get('/gallery', (req,res) => {
-  res.render('gallery/main');
-});
-
 router.get('/gallery/upload', (req, res) => {
   res.render('gallery/upload');
 });

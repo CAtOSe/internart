@@ -5,4 +5,5 @@ router.all('/', (req, res) => {
   res.render('site/landing');
 });
 
+
 module.exports = router;
