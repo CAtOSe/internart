@@ -16,11 +16,17 @@ nav {
   border-bottom: 3px solid $fgBlack;
   padding: 15px 0px 15px 0px;
 
+  i {
+    margin-left: 16px;
+  }
+
   #searchBar {
     width: 80%;
+    margin-left: 12px;
     font-size: 1.2em;
     border: none;
     font-family: $font;
     font-weight: $fLight;
+    vertical-align: top;
   }
 }

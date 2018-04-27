@@ -1,0 +1,40 @@
+@import '_vars.scss';
+main {
+  padding: 0px 16px 0px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 1em;
+
+.art {
+  display: grid;
+  background: $bgWhite1;
+  grid-template-rows: 3fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+
+  .img {
+    width: 100%;
+    height: 20vh;
+    grid-column: 1/3;
+    background-size: cover;
+    background-position: center center;
+    }
+
+    .artist {
+      grid-row: 3;
+      grid-column: 1;
+    }
+
+    .likes {
+      grid-row:3;
+      grid-column: 2;
+      color: $fgBlack1;
+      font-size: 0.8em;
+      text-align: right;
+
+      i {
+        font-size: 16px;
+        margin-right: 8px;
+      }
+    }
+  }
+}
