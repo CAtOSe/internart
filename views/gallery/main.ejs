@@ -6,26 +6,32 @@
   <link rel="stylesheet" type="text/css" href="assets/style/main.min.css" />
   <link rel="stylesheet" type="text/css" href="assets/style/gallery.min.css" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <nav>
-    <i class="material-icons">&#xE8B6;</i>
     <input id="searchBar" placeholder="search" />
   </nav>
+
   <main id="gallery">
-    <div class="art">
-      <div class="img" style="background-image: url('assets/test.jpg')" ></div>
-      <span class="title">Nightly</span>
-      <span class="artist">Random Artist</span>
-      <span class="likes"><i class="material-icons">&#xE8DC;</i><span>125</span></span>
-    </div>
-    <div class="art">
-      <div class="img" style="background-image: url('assets/test2.jpg')" ></div>
-      <span class="title">Nightly</span>
-      <span class="artist">Random Artist</span>
-      <span class="likes"><i class="material-icons">&#xE8DC;</i><span>125</span></span>
-    </div>
+
+    <a class="art shadow delink" href="art/">
+      <div class="image" style="background-image: url('assets/test.jpg')"></div>
+      <div class="art-info">
+        <span class="title">Nightly</span>
+        <span class="artist">Random Artist</span>
+      </div>
+    </a>
+
+    <a class="art shadow delink" href="art/">
+      <div class="image" style="background-image: url('assets/test2.jpg')"></div>
+      <div class="art-info">
+        <span class="title">Nightly</span>
+        <span class="artist">Random Artist</span>
+      </div>
+    </a>
+
   </main>
 </body>
 </html>
