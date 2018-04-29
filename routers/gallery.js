@@ -1,39 +1,39 @@
-module.exports = function(app, pool, galleryAPI, fs, userAPI) {
+module.exports = function(app, pool, galleryAPI, userAPI) {
 
-  app.post('/api/g/getArtwork', (req, res) => {
-    req.body.data = JSON.parse(req.body.data);
-    galleryAPI.getArtwork(pool, req.body.data.id, (response) => {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(response));
-    });
-  });
-
-
-  app.post('/api/g/upload', (req, res) => {
-    userAPI.getUserByReq(pool, req, (response) => {
-      if (response.status.code == 200){
-        galleryAPI.uploadArtwork(pool, fs, req, [response.data.id], (response) => {
-          res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(response));
-        });
-      } else if (response.status.code == 403) {
-        galleryAPI.uploadCancel(req, () => {
-          res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(response));;
-        });
+  app.get('/', (req, res) => {
+    galleryAPI.getArtworkList(pool, userAPI, (response) => {
+      if (response.status.code == 200) {
+        res.render('gallery/main', {"artwork": response.data});
       } else {
-        console.log(response.status.code);
-        galleryAPI.uploadCancel(req, () => {
-          let response = {
-            status: {
-              code: 500,
-              message: 'Unknown internal error'
-            }
-          };
-          res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(response));;
-        });
+        res.render('gallery/main', {"artwork": false});
       }
     });
   });
+
+  app.get('/art/:artID', (req, res) => {
+    galleryAPI.getArtwork(pool, req.params['artID'], (response) => {
+      if (response.status.code == 200) {
+        let artwork = {
+          "id": response.data.id,
+          "path": '/artwork/' + response.data.filename,
+          "title": response.data.title,
+          "date": response.data.date,
+          "ownerName": "",
+          "ownerID": response.data.owner,
+          "votes": response.data.votes
+        };
+        userAPI.getUserByID(pool, response.data.owner, (user) => {
+          artwork.ownerName = user.data.username;
+          res.render('gallery/art', {artwork});
+        });
+      } else {
+        res.render('404');
+      }
+    });
+  });
+
+  app.get('/gallery/upload', (req, res) => {
+    res.render('gallery/upload');
+  });
+
 }

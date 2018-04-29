@@ -224,7 +224,7 @@ module.exports.login = function (pool, loginData, callback) {
 }
 // PROBABLY WILL BE UNUSED
 module.exports.getUserByReq = function (pool, reqst, callback) {
-  if (reqst.session.userID == undefined) {
+  if (reqst.session == undefined || reqst.session.userID == undefined) {
     let response = {
       status: {
         code: 403,
@@ -233,10 +233,11 @@ module.exports.getUserByReq = function (pool, reqst, callback) {
     };
     callback(response);
     return;
+  } else {
+    module.exports.getUserByID(pool, reqst.session.userID, (response) => {
+      callback(response);
+    }, true);
   }
-  module.exports.getUserByID(pool, reqst.session.userID, (response) => {
-    callback(response);
-  }, true);
 }
 
 module.exports.isLoggedIn = function(req) {

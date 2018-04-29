@@ -2,14 +2,13 @@ const args = process.argv.slice(2);
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
 const pgSession = require('connect-pg-simple')(session);
 const busboy = require('connect-busboy');
 const fs = require('fs');
 
-const staticRouter = require('./routers/static');
 const site = require('./routers/site');
-const gallery = require('./routers/gallery');
 
 const userAPI = require('./apis/userAPI');
 const galleryAPI = require('./apis/galleryAPI');
@@ -22,6 +21,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 app.use(busboy());
+app.use(cookieParser());
 
 const pool = new Pool({
   user: args[1],
@@ -47,11 +47,13 @@ app.use(session({
   secure: true
 }));
 
-require('./routers/user')(app, pool, userAPI);
-require('./routers/gallery')(app, pool, galleryAPI, fs, userAPI);
+require('./routers/userAPIr')(app, pool, userAPI);
+require('./routers/galleryAPIr')(app, pool, galleryAPI, fs, userAPI);
+require('./routers/gallery')(app, pool, galleryAPI, userAPI);
+require('./routers/static')(app, pool);
 
 app.use('/assets', express.static('assets'));
-app.use('/', staticRouter);
+app.use('/artwork', express.static('artwork'));
 app.use('/', site);
 
 app.all('/api/*', (req, res) => {

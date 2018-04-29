@@ -108,5 +108,5 @@ module.exports.checkGroupsPermission = function (pool, userGroups, permission, c
       };
       callback(response);
     }
-  })
+  });
 }

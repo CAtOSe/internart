@@ -1,5 +1,5 @@
 @import '_vars.scss';
-main {
+main#gallery {
   //padding: 0px 32px 0px 32px;
   padding: 32px;
   display: grid;
@@ -35,7 +35,77 @@ main {
       margin-bottom: auto;
     }
 
-    .title {font-weight: 400;font-size: 1.2em}
-    .artist {font-weight: 300;font-size: 1em}
+    .title { font-weight: 400; font-size: 1.2em; }
+    .artist {
+      font-weight: 300;
+      font-size: 1em;
+      line-height: 1.2em;
+
+      img {
+        vertical-align: bottom;
+        height: 1.2em;
+        border-radius: 50%;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+main#art {
+  background: $bgWhite1;
+  #art-img {
+    display: block;
+    max-height: 80vh;
+    max-width: 100vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .art-info {
+    padding: 12px 32px;
+    box-sizing: border-box;
+
+    p, span { display: block; margin: 0px;}
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      .title { padding: 6px 0px; margin-top: auto; margin-bottom: auto; font-size: 1.9em; font-weight: 400; }
+      .artist {
+        padding: 6px 0px;
+        margin-top: auto;
+        margin-bottom: auto;
+        font-size: 1.2em;
+        font-weight: 300;
+
+        img {
+          vertical-align: middle;
+          height: 2em;
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+      }
+
+      @media (min-width: 320px) and (max-width: 480px) { & {display: block;} }
+    }
+
+    .votes {
+      margin: 10px 0px;
+      font-size: 0.9em;
+      color: $fgBlack1;
+      i {
+        margin-right: 4px;
+        vertical-align: bottom;
+      }
+    }
+
+    .label {
+      color: $fgBlack1;
+      font-weight: 300;
+    }
+
+    .description {
+      font-size: 1.2em;
+    }
   }
 }

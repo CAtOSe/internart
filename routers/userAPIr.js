@@ -1,7 +1,6 @@
 module.exports = function(app, pool, userAPI) {
 
   app.post('/api/u/getUser', (req, res) => {
-    console.log('what?');
     if(req.body.userID == undefined){
       let response = {
         status: {
@@ -13,12 +12,10 @@ module.exports = function(app, pool, userAPI) {
       res.send(JSON.stringify(response));
       return;
     }
-    console.log(0);
     userAPI.getUserByID(pool, req.body.userID, (user) => {
       if (userAPI.isLoggedIn(req)) {
         userAPI.checkUserPermission(pool, {'userID': req.session.userID}, 'seeEmail', (result) => {
           if (result.data.value == 1) {
-            console.log(3);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify(user));
           } else {
@@ -92,10 +89,12 @@ module.exports = function(app, pool, userAPI) {
     userAPI.login(pool, {'loginName':req.body.loginName, 'loginPassword':req.body.loginPassword}, (response) => {
       if (response.status.code == 200) {
         req.session.userID = response.data.userID;
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
       }
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(response));
-      return;
     });
   });
 
