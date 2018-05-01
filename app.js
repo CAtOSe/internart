@@ -8,8 +8,6 @@ const pgSession = require('connect-pg-simple')(session);
 const busboy = require('connect-busboy');
 const fs = require('fs');
 
-const site = require('./routers/site');
-
 const userAPI = require('./apis/userAPI');
 const galleryAPI = require('./apis/galleryAPI');
 
@@ -50,11 +48,10 @@ app.use(session({
 require('./routers/userAPIr')(app, pool, userAPI);
 require('./routers/galleryAPIr')(app, pool, galleryAPI, fs, userAPI);
 require('./routers/gallery')(app, pool, galleryAPI, userAPI);
-require('./routers/static')(app, pool);
+require('./routers/user')(app, pool);
 
 app.use('/assets', express.static('assets'));
 app.use('/artwork', express.static('artwork'));
-app.use('/', site);
 
 app.all('/api/*', (req, res) => {
   var response={

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>InternArt</title>
+  <link rel="stylesheet" type="text/css" href="/assets/style/main.min.css" />
+  <link rel="stylesheet" type="text/css" href="/assets/style/user.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/popups.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+  <main id="login">
+    <h1>internart</h1>
+    <div id="box">
+      <div class="headerBox">
+        <span class="pointer sel login">LOGIN</span>
+        <span class="pointer register">REGISTER</span>
+      </div>
+
+      <form class="login">
+        <div>
+          <input type="text" placeholder="login name" name="loginName" />
+          <input type="password" placeholder="password" name="loginPassword"/>
+        </div>
+        <input class="delink submit pointer detext" type="submit" value="LOGIN" />
+      </form>
+
+      <form class="register hide">
+        <div>
+          <input type="text" placeholder="login name" name="loginName" />
+          <input type="password" placeholder="password" name="loginPassword"/>
+        </div>
+        <input class="delink submit pointer detext" type="submit" value="REGISTER" />
+      </form>
+
+      <div class="linear-activity hide">
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+  </main>
+  <script src="/assets/js/loginPageControl.js">
+  </script>
+  <!-- Hello there... :) -->
+</body>
+</html>

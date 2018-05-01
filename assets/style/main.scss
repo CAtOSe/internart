@@ -1,10 +1,11 @@
 @import '_vars.scss';
-//@import '_reset.scss';
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400');
 
 body {
   width: 100%;
   height: 100%;
+  width: 100vw;
+  height: 100vh;
   background: $bgWhite;
   color: $fgBlack;
   font-family: $font;
@@ -15,39 +16,89 @@ body {
 nav {
   width: 100%;
   border-bottom: 3px solid $fgBlack;
-  padding: 15px 32px 15px 32px;
+  padding: 10px 32px;
   box-sizing: border-box;
   overflow: hidden;
+  display: flex;
+  @media (min-width: 100px) and (max-width: 480px) {
+    padding: 10px 16px;
+  }
 
   #searchBar {
-    width: 100%;
+    flex: 1;
     font-size: 1.2em;
     border: none;
     font-family: $font;
     font-weight: $fLight;
     vertical-align: top;
   }
+
+  span#userBar {
+    margin-left: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 1.2em;
+    font-weight: $fLight;
+
+    a:hover {
+      color: $fgBlack1;
+    }
+
+    img {
+      vertical-align: middle;
+      height: 1.6em;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .loggedIn { display: none;}
+
+    @media (min-width: 100px) and (max-width: 480px) {
+      .smallHide { display: none !important; }
+      img {margin-right: 0px;}
+    }
+  }
 }
 
 .shadow {
+  @extend %transition;
   -webkit-box-shadow: 0 3px 5px 2px $shadow1;
   box-shadow: 0 3px 5px 2px $shadow1;
-  -webkit-transition: box-shadow 200ms ease;
-  -moz-transition: box-shadow 200ms ease;
-  -ms-transition: box-shadow 200ms ease;
-  -o-transition: box-shadow 200ms ease;
-  transition: box-shadow 200ms ease;
+
   &:hover {
     -webkit-box-shadow: 0 3px 5px 2px $shadow2;
     box-shadow: 0 3px 5px 2px $shadow2;
   }
 }
 
-.pointer {
-  cursor: pointer;
-}
+.popups {
+  position: absolute;
+  top: 0;
+  left: 0;
 
-.delink {
-  color: inherit;
-  text-decoration: inherit;
+  .popup {
+    white-space: pre;
+    position: absolute;
+    background: $bgWhite1;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 1.1em;
+  }
+
+  .userBarExt {
+    position: absolute;
+    white-space: pre;
+    display: flex;
+    flex-direction: column;
+    background: $bgWhite1;
+
+    a {
+      @extend %transition;
+      padding: 10px 24px;
+
+      &:hover {
+        background: $bgWhite2;
+      }
+    }
+  }
 }

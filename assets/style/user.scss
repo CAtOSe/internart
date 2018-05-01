@@ -1,0 +1,105 @@
+@import '_vars.scss';
+
+main#login {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 50px 0px;
+  box-sizing: border-box;
+
+  @media (min-width: 100px) and (max-width: 480px) {
+    padding: 25px 0px;
+  }
+
+  h1 {
+    font-weight: $fLight;
+    letter-spacing: 0.5em;
+    margin-bottom: 100px;
+    @media (min-height: 100px) and (max-height: 480px) {
+      margin-bottom: 50px;
+    }
+  }
+
+  div#box {
+    background: $bgWhite1;
+
+    div.headerBox{
+      width: 100%;
+      height: auto;
+      display: flex;
+
+      span {
+        @extend %transition;
+        @extend .detext;
+        flex: 1;
+        font-size: 1.1em;
+        padding: 16px 0px;
+        text-align: center;
+        background: $bgWhite0;
+
+        &.sel, &:hover { background: $bgWhite1; }
+
+      }
+    }
+
+    form.login div, form.register div {
+      @media (min-width: 100px) and (max-width: 430px) {
+        width: 100vw;
+        padding: 0px 16px;
+        box-sizing: border-box;
+      }
+    }
+
+    input[type=text], input[type=password] {
+      @extend %transition;
+      display: block;
+      width: 350px;
+      margin: 32px 32px;
+      font-size: 1.1em;
+      padding: 8px;
+      border: none;
+      border-bottom: 2px solid $fgBlack1;
+      background: transparent;
+
+      @media (min-width: 100px) and (max-width: 430px) {
+        width: 100%;
+        margin: 32px 0px;
+        box-sizing: border-box;
+      }
+
+      &:hover, &:focus, &:active {
+        border-color: $fgBlack;
+      }
+    }
+
+    .reject {
+      border-color: $red !important;
+      &:hover, &:focus, &:active {
+        border-color: $red !important;
+      }
+    }
+
+    input.submit{
+      @extend %transition;
+      border: none;
+      letter-spacing: 0.1em;
+      width: 100%;
+      background: $bgWhite2;
+      padding: 16px 0px;
+      color: $fgBlack1;
+      font-size: 1.1em;
+      text-align: center;
+      font-weight: $fRegular;
+
+      &:hover {
+        background: $bgWhite3;
+      }
+    }
+
+    .linear-activity {
+      margin: 0px;
+      width: 100%;
+    }
+  }
+}

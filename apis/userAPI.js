@@ -173,7 +173,8 @@ module.exports.login = function (pool, loginData, callback) {
                   message: "User authenticated"
                 },
                 data:{
-                  userID: user.data.id
+                  userID: user.data.id,
+                  username: user.data.username
                 }
               };
               callback(response);

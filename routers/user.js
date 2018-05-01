@@ -2,7 +2,7 @@ module.exports = function(app, pool) {
 
 //LOGIN
 app.get('/login', (req, res) => {
-	res.render('site/login');
+	res.render('user/login');
 });
 
 // USERS

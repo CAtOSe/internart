@@ -1,11 +1,86 @@
-$bgWhite:   #ffffff;
-$bgWhite1: #eeeeee;
+$bgWhite0:   #fcfcfc;
+$bgWhite:   #fff;
+$bgWhite1: #eee;
+$bgWhite11: #dedede;
+$bgWhite2: #c1c1c1;
+$bgWhite3: #b4b4b4;
 $fgBlack:   rgba(0, 0, 0, 0.87);
 $fgBlack1: rgba(0, 0, 0, 0.54);
 $shadow1: rgba(0, 0, 0, 0.15);
 $shadow2: rgba(0, 0, 0, 0.25);
+$red: #F36657;
 
 // FONTS
 $font: 'Roboto', sans-serif;
 $fLight: 300;
 $fRegular: 400;
+
+// DISPLAY
+.hide { display: none; }
+.pointer { cursor: pointer; }
+.delink { color: inherit; text-decoration: inherit; }
+.detext {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// TRANSITIONS
+%transition {
+  -webkit-transition: all 200ms ease;
+  -moz-transition: all 200ms ease;
+  -ms-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+}
+
+// LOADERS
+.linear-activity {
+    overflow: hidden;
+    width: 50%;
+    height: 4px;
+    background-color: $bgWhite1;
+    margin: 20px auto;
+}
+.indeterminate {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.indeterminate:before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    background-color: $fgBlack;
+    animation: indeterminate_first 1.5s infinite ease-out;
+}
+.indeterminate:after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    background-color: $fgBlack1;
+    animation: indeterminate_second 1.5s infinite ease-in;
+}
+@keyframes indeterminate_first {
+    0% {
+        left: -100%;
+        width: 100%;
+    }
+    100% {
+        left: 100%;
+        width: 10%;
+    }
+}
+@keyframes indeterminate_second {
+    0% {
+        left: -150%;
+        width: 100%;
+    }
+    100% {
+        left: 100%;
+        width: 10%;
+    }
+}

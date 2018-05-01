@@ -89,6 +89,8 @@ module.exports = function(app, pool, userAPI) {
     userAPI.login(pool, {'loginName':req.body.loginName, 'loginPassword':req.body.loginPassword}, (response) => {
       if (response.status.code == 200) {
         req.session.userID = response.data.userID;
+        res.cookie('username', response.data.username);
+        res.cookie('id', response.data.userID);
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(response));
       } else {
@@ -111,6 +113,8 @@ module.exports = function(app, pool, userAPI) {
     userAPI.getUserByReq(pool, req, (response) => {
       if (response.status.code == 200) {
         req.session.destroy();
+        res.clearCookie('username');
+        res.clearCookie('id');
         response = {
           status: {
             code: 200,
@@ -121,9 +125,11 @@ module.exports = function(app, pool, userAPI) {
         res.send(JSON.stringify(response));
       } else if (response.status.code == 403) {
         req.session.destroy();
+        res.clearCookie('username');
+        res.clearCookie('id');
         response = {
           status: {
-            code: 200,
+            code: 403,
             message: 'Already logged out'
           }
         };
