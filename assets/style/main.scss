@@ -18,8 +18,22 @@ nav {
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
+  align-items: center;
   @media (min-width: 100px) and (max-width: 480px) {
     padding: 10px 16px;
+  }
+  a.home {
+    display: flex;
+    align-items: center;
+  }
+  i.home {
+    @extend %transition;
+    @extend .pointer;
+    color: $fgBlack1;
+    margin-right: 16px;
+    &:hover {
+      color: $fgBlack;
+    }
   }
 
   #searchBar {
@@ -28,28 +42,39 @@ nav {
     border: none;
     font-family: $font;
     font-weight: $fLight;
-    vertical-align: top;
+    min-width: 0
   }
 
   span#userBar {
     margin-left: 10px;
-    margin-top: auto;
-    margin-bottom: auto;
     font-size: 1.2em;
     font-weight: $fLight;
+    display: flex;
+    align-items: center;
 
     a:hover {
       color: $fgBlack1;
     }
 
-    img {
-      vertical-align: middle;
-      height: 1.6em;
-      border-radius: 50%;
-      margin-right: 6px;
+    a.loggedIn {
+      @extend %transition;
+      display: inline-flex;
+      align-items: center;
+      margin: 0px 12px;
+      color: $fgBlack1;
+      &:hover, &:focus {
+        color: $fgBlack;
+      }
     }
 
-    .loggedIn { display: none;}
+    img {
+      @extend .pointer;
+      height: 1.6em;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    span { @extend .pointer; }
 
     @media (min-width: 100px) and (max-width: 480px) {
       .smallHide { display: none !important; }
@@ -71,7 +96,7 @@ nav {
 
 .popups {
   z-index: 999;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
 
@@ -85,7 +110,6 @@ nav {
   }
 
   .userBarExt {
-    position: absolute;
     white-space: pre;
     display: flex;
     flex-direction: column;

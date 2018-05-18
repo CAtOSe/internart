@@ -142,4 +142,21 @@ module.exports = function(app, pool, userAPI) {
     });
   });
 
+  app.post('/api/u/checkPermission', (req, res) => {
+    if (req.body['userID'] != undefined && req.body['permission'] != undefined) {
+      userAPI.checkUserPermission(pool, {userID: req.body['userID']}, req.body['permission'], (response) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
+      });
+    } else {
+      let response = {
+        status: {
+          code: 400,
+          message: "Request info undefined"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+    }
+  });
 }

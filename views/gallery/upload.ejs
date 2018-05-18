@@ -1,17 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>InternArt</title>
+  <link rel="stylesheet" type="text/css" href="/assets/style/main.min.css" />
+  <link rel="stylesheet" type="text/css" href="/assets/style/gallery.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/assets/js/popups.js"></script>
 </head>
 <body>
-  <h1>InternArt</h1>
-  <h3>Gallery | UPLOAD</h3>
-  <form method="post" action="/api/g/upload" enctype="multipart/form-data">
-    <input type="file" id="fileUpload" name="fileUpload" accept="image/*" />
-    <input type="text" name="title"  />
-    <br />
-    <input type="submit" value="Upload" />
-  </form>
+  <%- include('../topNav.ejs') %>
+  <main id="upload1">
+    <h3>Upload</h3>
+    <form class="fileUpload" id="fileInfo">
+      <div class="inputWrapper">
+        <i class="material-icons">file_upload</i>
+        <br />
+        <div>
+          <input type="file" id="fileUpload" name="fileUpload" accept="image/*" />
+          <label for="fileUpload" class="pointer">Choose a file</label>
+          <span>or drag & drop.</span>
+        </div>
+      </div>
+      <div class="linear-activity hide">
+        <div class="indeterminate"></div>
+      </div>
+    </form>
+  </main>
+  <script src="/assets/js/upload.js"></script>
 </body>
+<!--
+<form method="post" action="/api/g/upload" enctype="multipart/form-data">
+  <input type="file" id="fileUpload" name="fileUpload" accept="image/*" />
+  <input type="text" name="title"  />
+  <br />
+  <input type="submit" value="Upload" />
+</form>
+-->
 </html>

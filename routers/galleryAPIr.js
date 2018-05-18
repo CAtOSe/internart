@@ -3,6 +3,29 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
   app.post('/api/g/getArtwork', (req, res) => {
     req.body.data = JSON.parse(req.body.data);
     galleryAPI.getArtwork(pool, req.body.data.id, (response) => {
+      if (response.status.code == 200) {
+        if (response.data.visibility == 0) {
+          userAPI.getUserByReq(pool, req, (user) => {
+            if (user.status.code == 200){
+              if (response.data.owner != user.data.id) {
+                response = {
+                  status: {
+                    code: 401,
+                    message: "Unauthorized"
+                  }
+                };
+              }
+            } else {
+              response = {
+                status: {
+                  code: 401,
+                  message: "Unauthorized"
+                }
+              }
+            }
+          });
+        }
+      }
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(response));
     });
@@ -20,24 +43,28 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
                 res.send(JSON.stringify(response));
               });
             } else {
+              galleryAPI.uploadCancel(req, () => {
+                let response = {
+                  status: {
+                    code: 403,
+                    message: "Permission denied"
+                  }
+                };
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify(response));
+              });
+            }
+          } else {
+            galleryAPI.uploadCancel(req, () => {
               let response = {
                 status: {
-                  code: 403,
-                  message: "No Access"
+                  code: 500,
+                  message: "Unknown error"
                 }
               };
               res.setHeader('Content-Type', 'application/json');
               res.send(JSON.stringify(response));
-            }
-          } else {
-            let response = {
-              status: {
-                code: 500,
-                message: "Unknown error"
-              }
-            };
-            res.setHeader('Content-Type', 'application/json');
-            res.send(JSON.stringify(response));
+            });
           }
         });
       } else if (response.status.code == 403) {
@@ -46,7 +73,6 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
           res.send(JSON.stringify(response));;
         });
       } else {
-        console.log(response.status.code);
         galleryAPI.uploadCancel(req, () => {
           let response = {
             status: {
@@ -62,10 +88,72 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
   });
 
   app.post('/api/g/deleteArtwork', (req, res) => {
-    userAPI.getUserByReq(pool, req, (response) => {
+    if (req.body.artID != undefined) {
+      userAPI.getUserByReq(pool, req, (user) => {
+        if (user.status.code == 200) {
+          galleryAPI.getArtwork(pool, req.body.artID, (art) => {
+            if (art.status.code == 200) {
+              if (art.data.owner == user.data.id) {
+                galleryAPI.deleteArtwork(pool, fs, art.data.id, art.data.filename, (response) => {
+                  res.setHeader('Content-Type', 'application/json');
+                  res.send(JSON.stringify(response));
+                });
+              } else {
+                let response = {
+                  status: {
+                    code: 401,
+                    message: "Unauthorized"
+                  }
+                };
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify(response));
+              }
+            } else {
+              res.setHeader('Content-Type', 'application/json');
+              res.send(JSON.stringify(art));
+            }
+          });
+        } else {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(user));
+        }
+      });
+    } else {
+      let response = {
+        status: {
+          code: 400,
+          message: "artID undefined"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+    }
+  });
+
+  app.post('/api/g/getArtworkList', (req, res) => {
+    galleryAPI.getArtworkList(pool, userAPI, (response) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+    });
+  });
+
+  app.post('/api/g/editForm', (req, res) => {
+    galleryAPI.getArtwork(pool, req.body.artID, (response) => {
       if (response.status.code == 200) {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(response));
+        let artwork = {
+          "id": response.data.id,
+          "path": '/artwork/' + response.data.filename,
+          "title": response.data.title,
+          "date": response.data.date,
+          "ownerName": "",
+          "ownerID": response.data.owner,
+          "votes": response.data.votes,
+          "bgColor": response.data.bgcolor
+        };
+        if (artwork.title == "{{TEMP TITLE}}") {
+          artwork.title = "Untitled";
+        }
+        res.render('gallery/editForm.ejs', {artwork});
       } else {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(response));
@@ -73,10 +161,29 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
     });
   });
 
-  app.post('/api/g/getArtworkList', (req, res) => {
-    galleryAPI.getArtworkList(pool, userAPI, (response) => {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(response));
+  app.post('/api/g/edit', (req, res) => {
+    galleryAPI.canEdit(pool, req, req.body['artID'], userAPI, (resp) => {
+      if (resp === true) {
+        let data = {
+          id: req.body['artID'],
+          title: req.body['title'],
+          description: req.body['description'],
+          bgColor: req.body['bgColor']
+        };
+        galleryAPI.pushEdit(pool, data, (response) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      } else {
+        let response = {
+          status: {
+            code: 401,
+            message: "Unauthorized"
+          }
+        };
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
+      }
     });
   });
 }

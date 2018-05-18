@@ -16,8 +16,8 @@
   window.readCookie = readCookie; // or expose it however you want
   if (readCookie('username') != undefined) {
     $('nav span#userBar span.loggedIn').html(readCookie('username'));
-    $('.loggedIn').css('display', 'inline');
-    $('nav span#userBar div#loginBar').css('display', 'none');
+    $('.loggedIn').removeClass('hide');
+    $('nav span#userBar div#loginBar').addClass('hide');
     $('nav span#userBar').on('click', function(e){
         if ($('.userBarExt').length == 0) {
           let pop = popCustom($('#userBar'), 'bottom', 'right', '<div class="userBarExt shadow"><a class="delink" href="/u/' + readCookie('id') + '">Profile</a><a class="delink" href="/upload">Upload</a><a class="delink" id="logout">Logout</a></div>');
@@ -32,13 +32,14 @@
               method: 'POST'
             }).done(function(data) {
               if (data.status.code == 200 || data.status.code == 403) {
-                $('nav span#userBar div#loginBar').css('display', 'block');
-                $('.loggedIn').css('display', 'none');
+                $('nav span#userBar div#loginBar').removeClass('hide');
+                $('.loggedIn').addClass('hide');
                 popMessage($('nav'), 'bottom', 'right', data.status.message, 10, 1500);
                 console.log(data.status.code);
               } else {
                 popMessage($('nav'), 'bottom', 'right', 'Unkown error occured', 10, 1500);
               }
+              window.location.href = "/";
             });
           });
           pop_id = pop.id;

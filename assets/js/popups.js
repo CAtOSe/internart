@@ -36,19 +36,17 @@ function popMessage(elem, dir, anchor, text, offset = 0, time = 0) {
     text: text
   };
 
-  $('.popups').append('<span class="popup" id="' + popup.id + '">' + text + '</span>');
+  $('.popups').append('<span class="popup" id="' + popup.id + '" style="position: absolute;">' + text + '</span>');
   let popup_element = $('.popups #'+popup.id);
   let loc = getLocation(elem);
 
   if (dir == 'bottom') {
     popup.location.top = loc.top + loc.height + offset;
-    console.log(popup.location.top, loc.top, loc.height, offset);
     if (anchor == 'left') {
       popup.location.left = loc.left;
     } else if (anchor == 'center') {
       popup.location.left = loc.left + (loc.width/2 - popup_element.outerWidth()/2);
     } else if (anchor == 'right') {
-      console.log(popup_element.outerWidth());
       popup.location.left = loc.left + loc.width - popup_element.outerWidth();
     }
   } else if (dir == 'top') {
@@ -58,7 +56,6 @@ function popMessage(elem, dir, anchor, text, offset = 0, time = 0) {
     } else if (anchor == 'center') {
       popup.location.left = loc.left + (loc.width/2 - popup_element.outerWidth()/2);
     } else if (anchor == 'right') {
-      console.log(popup_element.outerWidth());
       popup.location.left = loc.left + loc.width - popup_element.outerWidth();
     }
   } else if (dir == 'left') {
@@ -80,6 +77,9 @@ function popMessage(elem, dir, anchor, text, offset = 0, time = 0) {
       popup.location.top = loc.top + loc.height - popup_element.outerHeight();
     }
   }
+
+  popup.location.top = popup.location.top + $(window).scrollTop();
+  popup.location.left = popup.location.left + $(window).scrollLeft();
 
   popup_element.css({
     'top': popup.location.top,
@@ -110,7 +110,7 @@ function popCustom(elem, dir, anchor, text, offset = 0, time = 0) {
   };
 
   $('.popups').append(text);
-  let popup_element = $('.popups > *:last').attr('id', popup.id);
+  let popup_element = $('.popups > *:last').attr('id', popup.id).css('position', 'absolute');
   let loc = getLocation(elem);
 
   if (dir == 'bottom') {
@@ -129,7 +129,6 @@ function popCustom(elem, dir, anchor, text, offset = 0, time = 0) {
     } else if (anchor == 'center') {
       popup.location.left = loc.left + (loc.width/2 - popup_element.outerWidth()/2);
     } else if (anchor == 'right') {
-      console.log(popup_element.outerWidth());
       popup.location.left = loc.left + loc.width - popup_element.outerWidth();
     }
   } else if (dir == 'left') {
@@ -151,6 +150,9 @@ function popCustom(elem, dir, anchor, text, offset = 0, time = 0) {
       popup.location.top = loc.top + loc.height - popup_element.outerHeight();
     }
   }
+
+  popup.location.top = popup.location.top + $(window).scrollTop();
+  popup.location.left = popup.location.left + $(window).scrollLeft()
 
   popup_element.css({
     'top': popup.location.top,

@@ -37,7 +37,7 @@ module.exports.getArtwork = function (pool, id, callback) {
 }
 
 module.exports.getArtworkList = function (pool, userAPI, callback) {
-    pool.query("SELECT id, owner, title, filename FROM artwork ORDER BY votes DESC LIMIT 10", [], (err, qres) => {
+    pool.query("SELECT id, owner, title, filename FROM artwork WHERE visibility = 1 ORDER BY votes DESC LIMIT 10", [], (err, qres) => {
       if (err) {
         let response = {
           status: {
@@ -132,7 +132,7 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
         req.busboy.on('finish', function(field){
           if (!errors) {
             let date  = new Date();
-            pool.query('INSERT INTO artwork(id, type, filename, owner, title, date, votes, bgcolor) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, type, id + extension, data[0], fields['title'], date.toISOString(), 0, 'eeeeee'], (err, qres) => {
+            pool.query('INSERT INTO artwork(id, type, filename, owner, title, date, votes, bgcolor) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, type, id + extension, data[0], '{{TEMP TITLE}}', date.toISOString(), 0, 'eeeeee'], (err, qres) => {
               if (err) {
                 console.log(err);
                 if (err['detail'].includes('already exists')){
@@ -194,4 +194,92 @@ module.exports.uploadCancel = function (req, callback) {
   });
 
   req.pipe(req.busboy);
+}
+
+module.exports.deleteArtwork = function(pool, fs, artID, path, callback) {
+  pool.query('DELETE FROM artwork WHERE id = $1', [artID], (err, qres) => {
+    if (err) {
+      let response = {
+        status: {
+          code: 500,
+          message: "SQL error"
+        }
+      };
+      callback(response);
+    } else {
+      fs.unlink('./artwork/' + path, (err) => {
+        if (err) {
+          let response = {
+            status: {
+              code: 500,
+              message: "FS error"
+            }
+          };
+          callback(response);
+        } else {
+          let response = {
+            status: {
+              code: 200,
+              message: "Deleted"
+            }
+          };
+          callback(response);
+        }
+      });
+    }
+  });
+}
+
+module.exports.canView = function (pool, req, artID, userAPI, callback) {
+  module.exports.getArtwork(pool, artID, (art) => {
+    if (response.status.code == 200) {
+      if (art.data.visibility == 1) {
+        return true;
+      } else {
+        userAPI.getUserByReq(pool, req, (user) => {
+          if (user.status.code == 200) {
+            if (user.data.id == art.data.owner) {
+              callback(true);
+            } else callback(false);
+          } else callback(false);
+        });
+      }
+    } else callback(false);
+  });
+}
+
+module.exports.canEdit = function (pool, req, artID, userAPI, callback) {
+  module.exports.getArtwork(pool, artID, (art) => {
+    if (art.status.code == 200) {
+      userAPI.getUserByReq(pool, req, (user) => {
+        if (user.status.code == 200) {
+          if (user.data.id == art.data.owner) {
+            callback(true);
+          } else callback(false);
+        } else callback(false);
+      });
+    } else callback(false);
+  });
+
+  module.exports.pushEdit = function (pool, data, callback) {
+    pool.query("UPDATE artwork SET title = $2, bgcolor = $3, description = $4, visibility = $5 WHERE id = $1", [data.id, data.title, data.bgColor, data.description, 1], (err, qres) => {
+      if (err) {
+        let response = {
+          status: {
+            code: 500,
+            message: 'SQL error'
+          }
+        };
+        callback(response);
+      } else {
+        let response = {
+          status: {
+            code: 200,
+            message: 'Post updated'
+          }
+        };
+        callback(response);
+      }
+    });
+  }
 }
