@@ -1,7 +1,7 @@
 module.exports = function(app, pool, galleryAPI, userAPI) {
 
   app.get('/', (req, res) => {
-    galleryAPI.getArtworkList(pool, userAPI, (response) => {
+    galleryAPI.getArtworkList(pool, userAPI, undefined, (response) => {
       if (response.status.code == 200) {
         res.render('gallery/main', {"artwork": response.data});
       } else {
@@ -15,7 +15,6 @@ module.exports = function(app, pool, galleryAPI, userAPI) {
       if (response.status.code == 200) {
         let artwork = {
           "id": response.data.id,
-          "path": '/artwork/' + response.data.filename,
           "title": response.data.title,
           "description": response.data.description,
           "date": response.data.date,
@@ -72,7 +71,6 @@ module.exports = function(app, pool, galleryAPI, userAPI) {
           if (response.status.code == 200) {
             let artwork = {
               "id": response.data.id,
-              "path": '/artwork/' + response.data.filename,
               "title": response.data.title,
               "description": response.data.description,
               "date": response.data.date,

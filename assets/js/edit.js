@@ -1,3 +1,14 @@
+$(function() {
+  $("#colorPicker").spectrum({
+      showInput: true,
+      color: '#' + bgColor,
+      preferredFormat: 'hex',
+      replacerClassName: 'colorPickerReplacer',
+      move: function(color) {
+        $('#art').css('backgroundColor', color.toHexString());
+      }
+  });
+});
 $('.title').val(title);
 $('.description').val(description)
 
@@ -12,7 +23,7 @@ saveBtn.on('click', function() {
       artID: artID,
       title: $('.title').val(),
       description: $('.description').val(),
-      bgColor: 'ffffff'
+      bgColor: $("#colorPicker").spectrum("get").toHex()
     }
   }).done(function(data) {
     if (data.status.code == 200) {

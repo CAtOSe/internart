@@ -17,10 +17,10 @@
     <% if (artwork != false) { %>
       <% for (let art of artwork) { %>
         <a class="art shadow delink" href="/art/<%= art.id %>">
-          <div class="image" style="background-image: url('<%= art.path %>')"></div>
+          <div class="image" style="background-image: url('/artwork/thumbs/<%= art.id %>.jpg')"></div>
           <div class="art-info">
             <span class="title"><%= art.title %></span>
-            <span class="artist"><img src="/assets/user.png" /><%= art.ownerName %></span>
+            <span class="artist"><img src="/users/avatar/<%= art.ownerID %>" /><%= art.ownerName %></span>
           </div>
         </a>
       <% } %>

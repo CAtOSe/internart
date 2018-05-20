@@ -1,28 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>InternArt</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/assets/style/main.min.css" />
+  <link rel="stylesheet" type="text/css" href="/assets/style/user.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/popups.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+  <%- include('../topNav.ejs') %>
+  <main id="user">
+    <div class="cover" style="background-image: url('/users/cover/<%= userID %>');"></div>
+    <div class="info">
+      <span class="name"><%= fullname %></span>
+      <div class="aboutme">
+        <span>about me</span>
+        <p>
+          <%= description %>
+        </p>
+      </div>
+    </div>
+    <img class="photo" src="/users/avatar/<%= userID %>" />
+  </main>
+  <div id="userGallery">
+    <% if (artwork != false) { %>
+      <% for (let art of artwork) { %>
+        <a class="art shadow delink" href="/art/<%= art.id %>">
+          <div class="image" style="background-image: url('/artwork/thumbs/<%= art.id %>.jpg')"></div>
+          <div class="art-info">
+            <span class="title"><%= art.title %></span>
+          </div>
+        </a>
+      <% } %>
+    <% } %>
+  </div>
   <script>
-    var userID = <%= userID %>
-    $.ajax({
-      url: "/api/u/getUser",
-      method: "POST",
-      data: {userID: userID}
-    }).done(function(data) {
-      if (data['status']['code'] == 200){
-        $('body').append('<h1>'+data['data']['fullname']+'</h1>');
-        $('body').append('<h3>'+data['data']['loginname']+'</h3>');
-        $('body').append('<h3>'+data['data']['id']+'</h4>');
-      }else if (data['status']['code'] == 404){
-        $('body').append('<h1>User not found</h1>');
-      }else{
-        $('body').append('<h1>Unknown error</h1>');
-      }
-    });
+    var userID = '<%= userID %>';
   </script>
+  <script src="/assets/js/user.js"></script>
 </body>
 </html>

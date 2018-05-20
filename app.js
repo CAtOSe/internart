@@ -48,7 +48,8 @@ app.use(session({
 require('./routers/userAPIr')(app, pool, userAPI);
 require('./routers/galleryAPIr')(app, pool, galleryAPI, fs, userAPI);
 require('./routers/gallery')(app, pool, galleryAPI, userAPI);
-require('./routers/user')(app, pool);
+require('./routers/user')(app, pool, userAPI, galleryAPI);
+require('./routers/site')(app, pool, fs);
 
 app.use('/assets', express.static('assets'));
 app.use('/artwork', express.static('artwork'));

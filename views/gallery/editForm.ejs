@@ -1,11 +1,14 @@
 <main id="art" class="edit" style="background-color:#<%= artwork.bgColor %>">
-  <img id="art-img" src="<%= artwork.path %>" />
+  <img id="art-img" src="/artwork/<%= artwork.id %>.jpg" />
   <div class="linear-activity hide">
     <div class="indeterminate"></div>
   </div>
   <div class="art-info">
     <div style="margin: 10px 0px;">
-      <span>COLOR PICKER</span>
+      <div class="colorPicker">
+        <span>Background</span>
+        <input type='text' id="colorPicker" />
+      </div>
       <div>
         <button id="deleteArtwork">Delete</button>
         <input type="submit" value="Save edits" />
@@ -13,7 +16,7 @@
     </div>
     <div>
       <input class="title edit" placeholder="Title" value="<%= artwork.title %>" />
-      <span class="artist edit"><a class="delink"><img src="/assets/user.png" /><%= artwork.ownerName %></a></span>
+      <span class="artist edit"><a class="delink"><img src="/users/avatar/<%= artwork.ownerID %>" /><%= artwork.ownerName %></a></span>
     </div>
     <span class="votes"><i class="material-icons pointer">thumb_up</i><%= artwork.votes %></span>
     <span class="label">description</span>

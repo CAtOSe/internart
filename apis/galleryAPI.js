@@ -1,5 +1,7 @@
 const randomstring = require('randomstring');
 const devnull = require('dev-null');
+const sharp = require('sharp');
+const streamToBuffer = require('stream-to-buffer');
 
 module.exports.getArtwork = function (pool, id, callback) {
   pool.query("SELECT * FROM artwork WHERE id = $1", [id], (err, qres) => {
@@ -36,62 +38,70 @@ module.exports.getArtwork = function (pool, id, callback) {
   });
 }
 
-module.exports.getArtworkList = function (pool, userAPI, callback) {
-    pool.query("SELECT id, owner, title, filename FROM artwork WHERE visibility = 1 ORDER BY votes DESC LIMIT 10", [], (err, qres) => {
-      if (err) {
-        let response = {
-          status: {
-            code: 500,
-            message: 'SQL error'
-          },
-          error: err
-        };
-        callback(response);
-        return;
-      } else if (qres.rows.length > 0) {
-        let artwork = {
-          status: {
-            code: 200,
-            message: "Artwork found"
-          },
-          data: []
-        };
+module.exports.getArtworkList = function (pool, userAPI, user, callback) {
+  let q;
+  let prms;
+  if (user != undefined) {
+    prms = [user];
+    q = "SELECT id, owner, title FROM artwork WHERE visibility = 1 AND owner = $1 ORDER BY date DESC"
+  } else {
+    prms = [];
+    q = "SELECT id, owner, title FROM artwork WHERE visibility = 1 ORDER BY votes DESC LIMIT 10";
+  }
+  pool.query(q, prms, (err, qres) => {
+    if (err) {
+      let response = {
+        status: {
+          code: 500,
+          message: 'SQL error'
+        },
+        error: err
+      };
+      callback(response);
+      return;
+    } else if (qres.rows.length > 0) {
+      let artwork = {
+        status: {
+          code: 200,
+          message: "Artwork found"
+        },
+        data: []
+      };
 
-        function rowToArtwork(row1) {
-          return new Promise((resolve, reject) => {
-            userAPI.getUserByID(pool, row1.owner, (user) => {
-              if (user.status.code == 200) {
-                artwork.data.push({
-                  id: row1.id,
-                  title: row1.title,
-                  ownerID: row1.owner,
-                  ownerName: user.data.username,
-                  path: '/artwork/' + row1.filename
-                });
-                resolve();
-              } else {
-                reject(user);
-              }
-            });
+      function rowToArtwork(row1) {
+        return new Promise((resolve, reject) => {
+          userAPI.getUserByID(pool, row1.owner, (user) => {
+            if (user.status.code == 200) {
+              artwork.data.push({
+                id: row1.id,
+                title: row1.title,
+                ownerID: row1.owner,
+                ownerName: user.data.username
+              });
+              resolve();
+            } else {
+              reject(user);
+            }
           });
-        }
-
-        function done() {
-          callback(artwork);
-        }
-
-        Promise.all(qres.rows.map(rowToArtwork)).then(done);
-      } else {
-        let response = {
-          status: {
-            code: 204,
-            message: 'No artwork found'
-          }
-        };
-        callback(response);
-        return;
+        });
       }
-    });
+
+      function done() {
+        callback(artwork);
+      }
+
+      Promise.all(qres.rows.map(rowToArtwork)).then(done);
+    } else {
+      let response = {
+        status: {
+          code: 204,
+          message: 'No artwork found'
+        }
+      };
+      callback(response);
+      return;
+    }
+  });
 }
 
 module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
@@ -113,7 +123,20 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
           extension = '.' + filename.split('.').pop();
           type = mimetype.split('/')[0];
           if (mimetype.includes('image')) {
-            file.pipe(fs.createWriteStream('./artwork/' + id + extension));
+            streamToBuffer(file, function (err, buffer) {
+              sharp(buffer)
+              .withoutEnlargement(true)
+              .resize(undefined, 720)
+              .jpeg({
+                quality: 60
+              })
+              .toFile('./artwork/thumbs/' + id + '.jpg');
+              sharp(buffer)
+              .jpeg({
+                quality: 100
+              })
+              .toFile('./artwork/' + id + '.jpg');
+            });
           } else {
             file.pipe(devnull());
             errors = true;
@@ -132,7 +155,7 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
         req.busboy.on('finish', function(field){
           if (!errors) {
             let date  = new Date();
-            pool.query('INSERT INTO artwork(id, type, filename, owner, title, date, votes, bgcolor) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, type, id + extension, data[0], '{{TEMP TITLE}}', date.toISOString(), 0, 'eeeeee'], (err, qres) => {
+            pool.query('INSERT INTO artwork(id, type, owner, title, date, votes, bgcolor) VALUES ($1, $2, $3, $4, $5, $6, $7)', [id, type, data[0], 'Untitled Artwork', date.toISOString(), 0, 'eeeeee'], (err, qres) => {
               if (err) {
                 console.log(err);
                 if (err['detail'].includes('already exists')){

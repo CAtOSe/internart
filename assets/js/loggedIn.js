@@ -17,10 +17,11 @@
   if (readCookie('username') != undefined) {
     $('nav span#userBar span.loggedIn').html(readCookie('username'));
     $('.loggedIn').removeClass('hide');
+    $('img').attr('src', '/users/avatar/' + readCookie('id'));
     $('nav span#userBar div#loginBar').addClass('hide');
     $('nav span#userBar').on('click', function(e){
         if ($('.userBarExt').length == 0) {
-          let pop = popCustom($('#userBar'), 'bottom', 'right', '<div class="userBarExt shadow"><a class="delink" href="/u/' + readCookie('id') + '">Profile</a><a class="delink" href="/upload">Upload</a><a class="delink" id="logout">Logout</a></div>');
+          let pop = popCustom($('#userBar'), 'bottom', 'right', '<div class="userBarExt shadow"><a class="delink" href="/u/' + readCookie('id') + '">Profile</a><a class="delink" href="/upload">Upload</a><a class="delink pointer" id="logout">Logout</a></div>');
           $(document).click(function(evnt) {
             if (evnt.target != $('span#userBar')[0] && evnt.target != $('img.loggedIn')[0] && evnt.target != $('span.loggedIn.smallHide')[0]) {
               removePopup(pop_id);

@@ -2,9 +2,9 @@ const randomstring = require('randomstring');
 const permissions = require('./permissions');
 
 module.exports.getUserByID = function (pool, userID, callback, returnPassword = false) {
-  let query = 'SELECT id, email, fullName, groups, username FROM users WHERE id = $1';
+  let query = 'SELECT id, email, fullName, groups, username, description FROM users WHERE id = $1';
   if (returnPassword) {
-    query = 'SELECT id, email, fullName, groups, username, password FROM users WHERE id = $1';
+    query = 'SELECT id, email, fullName, groups, username, password, description FROM users WHERE id = $1';
   }
   pool.query(query, [userID], (err, qres) => {
     if (err) {

@@ -131,10 +131,28 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
   });
 
   app.post('/api/g/getArtworkList', (req, res) => {
-    galleryAPI.getArtworkList(pool, userAPI, (response) => {
+    galleryAPI.getArtworkList(pool, userAPI, undefined, (response) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(response));
     });
+  });
+
+  app.post('/api/g/getUserArtworkList', (req, res) => {
+    if (req.body['userID'] != undefined) {
+      galleryAPI.getArtworkList(pool, userAPI, req.body['userID'], (response) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(response));
+      });
+    } else {
+      let response = {
+        status: {
+          code: 400,
+          message: "Bad request"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+    }
   });
 
   app.post('/api/g/editForm', (req, res) => {
@@ -150,9 +168,6 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
           "votes": response.data.votes,
           "bgColor": response.data.bgcolor
         };
-        if (artwork.title == "{{TEMP TITLE}}") {
-          artwork.title = "Untitled";
-        }
         res.render('gallery/editForm.ejs', {artwork});
       } else {
         res.setHeader('Content-Type', 'application/json');

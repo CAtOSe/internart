@@ -29,6 +29,7 @@ nav {
   i.home {
     @extend %transition;
     @extend .pointer;
+    @extend .not-selectable;
     color: $fgBlack1;
     margin-right: 16px;
     &:hover {
@@ -46,6 +47,7 @@ nav {
   }
 
   span#userBar {
+    @extend .not-selectable;
     margin-left: 10px;
     font-size: 1.2em;
     font-weight: $fLight;
@@ -117,7 +119,7 @@ nav {
 
     a {
       @extend %transition;
-      padding: 10px 24px;
+      padding: 10px 100px 10px 12px;
 
       &:hover {
         background: $bgWhite2;

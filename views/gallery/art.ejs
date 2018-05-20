@@ -14,7 +14,7 @@
   <%- include('../topNav.ejs') %>
 
   <main id="art" style="background-color:#<%= artwork.bgColor %>">
-    <img id="art-img" src="<%= artwork.path %>" />
+    <img id="art-img" src="/artwork/<%= artwork.id %>.jpg" />
     <div class="art-info">
       <div>
         <span class="title">
@@ -24,7 +24,7 @@
           <% } %>
         </span>
         <div>
-          <span class="artist"><a class="delink" href="/u/<%= artwork.ownerID %>"><img src="/assets/user.png" /><%= artwork.ownerName %></a></span>
+          <span class="artist"><a class="delink" href="/u/<%= artwork.ownerID %>"><img src="/users/avatar/<%= artwork.ownerID %>" /><%= artwork.ownerName %></a></span>
         </div>
       </div>
       <span class="votes"><i class="material-icons pointer">thumb_up</i><%= artwork.votes %></span>

@@ -78,6 +78,7 @@ main#art {
     div {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       .title { padding: 6px 0px; margin-top: auto; margin-bottom: auto; font-size: 1.9em; font-weight: $fRegular; }
 
       a {
@@ -274,6 +275,36 @@ textarea {
 
   &:hover, &:focus {
     border-color: $fgBlack;
+  }
+}
+
+div.colorPicker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important;
+
+  span {
+    color: $fgBlack1;
+    font-size: 0.9em;
+    font-weight: 300;
+  }
+}
+
+.colorPickerReplacer {
+  border: none;
+  background-color: $bgWhite2;
+}
+
+.sp-choose {
+  @extend %transition;
+  border: none !important;
+  background: $bgWhite2 !important;
+  color: $fgBlack !important;
+  text-shadow: none !important;
+  border-radius: 0px !important;
+
+  &:hover {
+    background: $bgWhite3 !important;
   }
 }
 
