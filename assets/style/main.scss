@@ -110,7 +110,7 @@ nav {
     font-size: 1.1em;
   }
 
-  .userBarExt {
+  .userBarExt, .adminToolsPopup {
     white-space: pre;
     display: flex;
     flex-direction: column;
@@ -185,6 +185,42 @@ main#gallery_search {
           margin-right: 4px;
         }
       }
+    }
+  }
+}
+
+main#err {
+  @extend .not-selectable;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span:first-child {
+    @extend %transition;
+    font-size: 6em;
+    font-weight: 300;
+    color: $fgBlack1;
+    margin: 48px 0px;
+    letter-spacing: 0.5em;
+    &::after {
+      content: '4';
+      letter-spacing: 0em;
+    }
+    &:hover {
+      color: $fgBlack;
+    }
+  }
+  span {
+    font-size: 1.6em;
+    margin: 32px 0px;
+  }
+  a {
+    @extend %transition;
+    color: $fgBlack1;
+    border-bottom: 2px solid $fgBlack1;
+    padding: 0px 4px;
+    &:hover {
+      color: $fgBlack;
+      border-color: $fgBlack;
     }
   }
 }

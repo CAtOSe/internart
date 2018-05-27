@@ -20,7 +20,10 @@
         <span class="title">
           <%= artwork.title %>
           <% if (userID == artwork.ownerID) { %>
-            <a id="edit" class="delink pointer"><i class="material-icons">edit</i></a>
+            <a id="edit" class="delink"><i class="material-icons">edit</i></a>
+          <% } %>
+          <% if (adminTools == true) { %>
+            <a id="adminTools" class="delink"><i class="material-icons">report</i></a>
           <% } %>
         </span>
         <div>
@@ -48,6 +51,9 @@
         window.location.replace("/edit/<%= artwork.id %>");
       });
     </script>
+  <% } %>
+  <% if (adminTools == true) { %>
+    <script src="/assets/js/adminTools.js"></script>
   <% } %>
 </body>
 </html>

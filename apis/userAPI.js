@@ -1,4 +1,5 @@
 const randomstring = require('randomstring');
+const bcrypt = require('bcrypt');
 const permissions = require('./permissions');
 const devnull = require('dev-null');
 const sharp = require('sharp');
@@ -94,38 +95,42 @@ module.exports.createUser = function (pool, userData, callback) {
         res.send(JSON.stringify(response));
         return;
       }else if(qres){
-        pool.query('INSERT INTO users(id, username, email, fullname, password, groups) VALUES ($1, $2, $3, $4, $5, $6)', [id, userData.username, userData.email, userData.fullname, userData.password, 'user'], (err, qres) => {
-          if (err){
-            if (err['detail'].includes('already exists')){
-              let response = {
-                status: {
-                  code: 400,
-                  message: "User already exists"
+        bcrypt.genSalt(12, function(err, salt) {
+          bcrypt.hash(userData.password, salt, function(err, hash) {
+            pool.query('INSERT INTO users(id, username, email, fullname, password, groups) VALUES ($1, $2, $3, $4, $5, $6)', [id, userData.username, userData.email, userData.fullname, hash, 'user'], (err, qres) => {
+              if (err){
+                if (err['detail'].includes('already exists')){
+                  let response = {
+                    status: {
+                      code: 400,
+                      message: "User already exists"
+                    }
+                  };
+                  callback(response);
+                }else{
+                  let response = {
+                    status: {
+                      code: 500,
+                      message: "SQL error"
+                    }
+                  };
+                  callback(response);
                 }
-              };
-              callback(response);
-            }else{
-              let response = {
-                status: {
-                  code: 500,
-                  message: "SQL error"
-                }
-              };
-              callback(response);
-            }
-          }else{
-            let response = {
-              status: {
-                code: 201,
-                message: "User created"
-              },
-              data: {
-                userID: id,
-                username: userData.username
+              }else{
+                let response = {
+                  status: {
+                    code: 201,
+                    message: "User created"
+                  },
+                  data: {
+                    userID: id,
+                    username: userData.username
+                  }
+                };
+                callback(response);
               }
-            };
-            callback(response);
-          }
+            });
+          });
         });
       }else{
         generateID();
@@ -169,55 +174,57 @@ module.exports.deleteUser = function(pool, userID, callback) {
 module.exports.login = function (pool, loginData, callback) {
   module.exports.getUserByLoginName(pool, loginData['loginName'], (user) => {
     if (user.status.code == 200) {
-      if (user.data.password == loginData['loginPassword']) {
-        permissions.checkGroupsPermission(pool, user.data.groups, 'canLogin', (perm) => {
-          if (perm.status.code == 200) {
-            if (perm.data.value == 1) {
-              let response = {
-                status: {
-                  code: 200,
-                  message: "User authenticated"
-                },
-                data:{
-                  userID: user.data.id,
-                  username: user.data.username
-                }
-              };
-              callback(response);
-              return;
+      bcrypt.compare(loginData['loginPassword'], user.data.password, function(err, res) {
+        if (res) {
+          permissions.checkGroupsPermission(pool, user.data.groups, 'canLogin', (perm) => {
+            if (perm.status.code == 200) {
+              if (perm.data.value == 1) {
+                let response = {
+                  status: {
+                    code: 200,
+                    message: "User authenticated"
+                  },
+                  data:{
+                    userID: user.data.id,
+                    username: user.data.username
+                  }
+                };
+                callback(response);
+                return;
+              } else {
+                let response = {
+                  status: {
+                    code: 403,
+                    message: "Can not login"
+                  },
+                  data:{
+                    userID: user.data.id
+                  }
+                };
+                callback(response);
+                return;
+              }
             } else {
               let response = {
                 status: {
-                  code: 403,
-                  message: "Can not login"
+                  code: 500,
+                  message: 'Unknown internal error'
                 },
-                data:{
-                  userID: user.data.id
-                }
+                data: perm
               };
               callback(response);
-              return;
             }
-          } else {
-            let response = {
-              status: {
-                code: 500,
-                message: 'Unknown internal error'
-              },
-              data: perm
-            };
-            callback(response);
-          }
-        })
-      } else {
-        let response = {
-          status: {
-            code: 204,
-            message: "Credentials denied"
-          }
-        };
-        callback(response);
-      }
+          })
+        } else {
+          let response = {
+            status: {
+              code: 204,
+              message: "Credentials denied"
+            }
+          };
+          callback(response);
+        }
+      });
     } else {
       let response = {
         status: {
@@ -288,7 +295,7 @@ module.exports.checkUserPermission = function (pool, user, permission, callback)
           }
         });
       } else {
-        callback(response);
+        callback(userData);
       }
     });
   } else {
@@ -391,56 +398,56 @@ module.exports.uploadCover = (pool, fs, req, userID, callback) => {
 }
 
 module.exports.uploadProfile = (pool, fs, req, userID, callback) => {
-    let extension, type, fields = {}, errors = false;
+  let extension, type, fields = {}, errors = false;
 
-    function saveFile() {
-      return new Promise((resolve, reject) => {
-        req.busboy.on('file', (field, file, filename, encoding, mimetype) => {
-          extension = '.' + filename.split('.').pop();
-          type = mimetype.split('/')[0];
-          if (mimetype.includes('image')) {
-            streamToBuffer(file, function (err, buffer) {
-              sharp(buffer)
-              .withoutEnlargement(true)
-              .resize(1024, 1024)
-              .crop(sharp.strategy.center)
-              .jpeg({
-                quality: 100
-              })
-              .toFile('./users/avatars/' + userID + '.jpg')
-              .then((i) => {
-                resolve(201);
-              });
+  function saveFile() {
+    return new Promise((resolve, reject) => {
+      req.busboy.on('file', (field, file, filename, encoding, mimetype) => {
+        extension = '.' + filename.split('.').pop();
+        type = mimetype.split('/')[0];
+        if (mimetype.includes('image')) {
+          streamToBuffer(file, function (err, buffer) {
+            sharp(buffer)
+            .withoutEnlargement(true)
+            .resize(1024, 1024)
+            .crop(sharp.strategy.center)
+            .jpeg({
+              quality: 100
+            })
+            .toFile('./users/avatars/' + userID + '.jpg')
+            .then((i) => {
+              resolve(201);
             });
+          });
 
-          } else {
-            file.pipe(devnull());
-            errors = true;
-            reject(500);
-          }
-        });
+        } else {
+          file.pipe(devnull());
+          errors = true;
+          reject(500);
+        }
       });
-    }
-
-    Promise.all([saveFile()]).then(function(values) {
-      if (values[0] == 201) {
-        let response = {
-          status: {
-            code: 201,
-            message: "Profile photo uplaoded"
-          }
-        }
-        callback(response);
-      } else {
-        let response = {
-          status: {
-            code: 500,
-            message: "Unknown error occured"
-          }
-        }
-        callback(response);
-      }
     });
+  }
 
-    req.pipe(req.busboy);
+  Promise.all([saveFile()]).then((values) => {
+    if (values[0] == 201) {
+      let response = {
+        status: {
+          code: 201,
+          message: "Profile photo uplaoded"
+        }
+      }
+      callback(response);
+    } else {
+      let response = {
+        status: {
+          code: 500,
+          message: "Unknown error occured"
+        }
+      }
+      callback(response);
+    }
+  });
+
+  req.pipe(req.busboy);
 }

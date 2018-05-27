@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>InternArt</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/popups.js"></script>
+  <link rel="stylesheet" type="text/css" href="/assets/style/main.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <h1>404</h1>
-  <a href="/">HOME</a>
+  <%- include('./topNav.ejs') %>
+  <main id="err">
+    <span>40</span>
+    <span>Whoops, seems you escaped the matrix. I'm afraid I can't let you do that.</span>
+     <a href="/" class="delink">Go home</a>
+  </main>
+
 </body>
 </html>

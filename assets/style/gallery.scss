@@ -40,7 +40,10 @@ main#gallery {
       margin-bottom: auto;
     }
 
-    .title { font-weight: $fRegular; font-size: 1.2em; }
+    .title {
+      font-weight: $fRegular;
+      font-size: 1.2em;
+    }
     .artist {
       font-weight: $fLight;
       font-size: 1em;
@@ -83,9 +86,11 @@ main#art {
 
       a {
         @extend %transition;
+        @extend .pointer;
+        @extend .not-selectable;
         margin: auto 8px;
         color: $fgBlack1;
-        &:hover, &:focus {
+        &.open, &:hover, &:focus {
           color: $fgBlack;
         }
       }
@@ -110,17 +115,19 @@ main#art {
 
     .votes {
       @extend %transition;
-      @extend .pointer;
       @extend .not-selectable;
       margin: 10px 0px;
       font-size: 0.9em;
       color: $fgBlack1;
-      &.voted, &:hover {
+      &.voted{
         color: $fgBlack;
       }
       i {
+        @extend %transition;
+        @extend .pointer;
         margin-right: 4px;
         vertical-align: bottom;
+        &:hover { color: $fgBlack; }
       }
       span {
         display: inline;

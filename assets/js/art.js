@@ -1,5 +1,5 @@
 $(function(){
-  $('.votes').on('click', function(){
+  $('.votes i').on('click', function(){
     $.ajax({
       url: '/api/g/vote',
       method: 'POST',
@@ -10,11 +10,9 @@ $(function(){
       if (data.status.code == 200 && data.status.message == "Voted") {
         $('.votes').addClass('voted');
         $('.votes span').html(data.votes.toString());
-        console.log(data.votes.toString());
       } else if (data.status.code == 200 && data.status.message == "DeVoted") {
         $('.votes').removeClass('voted');
         $('.votes span').html(data.votes.toString());
-        console.log(data.votes.toString());
       }
     });
   });

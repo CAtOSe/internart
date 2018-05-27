@@ -7,8 +7,5 @@ Running:
 $ node app.js <database host> <database user> <database password>
 ```
 
-TODO:
-* Authentication
-
 ---
 2018

@@ -23,25 +23,61 @@ module.exports = function(app, pool, galleryAPI, userAPI) {
           "votes": response.data.votes,
           "bgColor": response.data.bgcolor
         };
-        userAPI.getUserByID(pool, response.data.owner, (user) => {
-          artwork.ownerName = user.data.username;
-          userAPI.getUserByReq(pool, req, (usr) => {
-            let voted = false;
-            if (usr.status.code == 200) {
-              let userID = usr.data.id;
-              galleryAPI.hasVoted(pool, req.params['artID'], userID, (vote) => {
-                if (vote.status.code == 200 && vote.value == true) {
-                  voted = true;
-                  res.render('gallery/art', {artwork, userID, voted});
-                } else {
-                  res.render('gallery/art', {artwork, userID, voted});
-                }
-              });
-            } else {
-              let userID = "0"
-              res.render('gallery/art', {artwork, userID, voted});
-            }
+
+        function getOwnerName() {
+          return new Promise((resolve, reject) => {
+            userAPI.getUserByID(pool, response.data.owner, (user) => {
+              if (user.status.code == 200) {
+                artwork.ownerName = user.data.username;
+              } else {
+                artwork.ownerName = 'Anonymous';
+              }
+              resolve();
+            });
           });
+        }
+
+        let userID;
+        let voted = false;
+        let adminTools = false;
+        function setAdminTools(val) { adminTools = val; }
+        function checkUser() {
+          return new Promise((resolve, reject) => {
+            userAPI.getUserByReq(pool, req, (user) => {
+              if (user.status.code == 200) {
+                userID = user.data.id;
+
+                function hasVoted() {
+                  return new Promise((resolve1, reject1) => {
+                    galleryAPI.hasVoted(pool, artwork.id, userID, (vote) => {
+                      voted = vote.value;
+                      resolve1();
+                    });
+                  });
+                }
+
+                function adminTools() {
+                  return new Promise((resolve1, reject1) => {
+                    userAPI.checkUserPermission(pool, {groups: user.data.groups}, 'adminTools', (perm) => {
+                      if (perm.status.code == 200 && perm.data.value == 1) {
+                        setAdminTools(true);
+                      }
+                      resolve1();
+                    });
+                  });
+                }
+
+                Promise.all([hasVoted(), adminTools()]).then(() => {
+                  resolve();
+                });
+
+              } else resolve();
+            });
+          });
+        }
+
+        Promise.all([getOwnerName(), checkUser()]).then(() => {
+          res.render('gallery/art', {artwork, userID, voted, adminTools});
         });
       } else {
         res.render('404');

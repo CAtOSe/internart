@@ -89,11 +89,34 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
 
   app.post('/api/g/deleteArtwork', (req, res) => {
     if (req.body.artID != undefined) {
-      userAPI.getUserByReq(pool, req, (user) => {
-        if (user.status.code == 200) {
+      function getUser() {
+        return new Promise((resolve, reject) => {
+          userAPI.getUserByReq(pool, req, (user) => {
+            resolve(user);
+          });
+        });
+      }
+
+      function getArtwork() {
+        return new Promise((resolve, reject) => {
           galleryAPI.getArtwork(pool, req.body.artID, (art) => {
-            if (art.status.code == 200) {
-              if (art.data.owner == user.data.id) {
+            resolve(art);
+          });
+        });
+      }
+
+      Promise.all([getArtwork(), getUser()]).then((values) => {
+        let art = values[0];
+        let user = values[1];
+        if (art.status.code == 200 && user.status.code == 200) {
+          if (user.data.id == art.data.owner) {
+            galleryAPI.deleteArtwork(pool, fs, art.data.id, (response) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.send(JSON.stringify(response));
+            });
+          } else {
+            userAPI.checkUserPermission(pool, {groups: user.data.groups}, 'adminTools', (perm) => {
+              if (perm.status.code == 200 && perm.data.value == 1) {
                 galleryAPI.deleteArtwork(pool, fs, art.data.id, (response) => {
                   res.setHeader('Content-Type', 'application/json');
                   res.send(JSON.stringify(response));
@@ -102,22 +125,26 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
                 let response = {
                   status: {
                     code: 401,
-                    message: "Unauthorized"
+                    message: 'Unauthorized'
                   }
                 };
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify(response));
               }
-            } else {
-              res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify(art));
-            }
-          });
+            });
+          }
         } else {
+          let response = {
+            status: {
+              code: 500,
+              message: 'Unknown internal error'
+            }
+          };
           res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(user));
+          res.send(JSON.stringify(response));
         }
       });
+
     } else {
       let response = {
         status: {
