@@ -1,4 +1,4 @@
-(function(){
+$(function(){
   var cookies;
   var pop_id;
 
@@ -49,4 +49,4 @@
         }
     });
   }
-})();
+});

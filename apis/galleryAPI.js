@@ -147,7 +147,7 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
 
                   sharp(buffer)
                   .jpeg({
-                    quality: 100
+                    quality: 90
                   })
                   .toFile('./artwork/' + id + '.jpg')
                   .then((i) => {
