@@ -26,12 +26,20 @@ module.exports = function(app, pool, galleryAPI, userAPI) {
         userAPI.getUserByID(pool, response.data.owner, (user) => {
           artwork.ownerName = user.data.username;
           userAPI.getUserByReq(pool, req, (usr) => {
+            let voted = false;
             if (usr.status.code == 200) {
               let userID = usr.data.id;
-              res.render('gallery/art', {artwork, userID});
+              galleryAPI.hasVoted(pool, req.params['artID'], userID, (vote) => {
+                if (vote.status.code == 200 && vote.value == true) {
+                  voted = true;
+                  res.render('gallery/art', {artwork, userID, voted});
+                } else {
+                  res.render('gallery/art', {artwork, userID, voted});
+                }
+              });
             } else {
               let userID = "0"
-              res.render('gallery/art', {artwork, userID});
+              res.render('gallery/art', {artwork, userID, voted});
             }
           });
         });

@@ -1,0 +1,62 @@
+<main id="user">
+  <div class="cover" style="background-image: url('/users/cover/<%= userID %>');">
+    <div>
+      <a id="changeCover" class="delink"><i class="material-icons">photo</i>Change Cover</a>
+    </div>
+  </div>
+  <div class="info">
+    <input type="text" class="name edit" palceholder="full name" />
+    <div class="aboutme edit">
+      <span>about me</span>
+      <textarea></textarea>
+    </div>
+  </div>
+  <div class="info edit">
+    <button id="deleteUser">Delete</button>
+    <button id="saveBtn">Save Edits</button>
+  </div>
+  <img class="photo" src="/users/avatar/<%= userID %>" />
+  <div class="changePhoto">
+    <a id="changePhoto" class="delink"><i class="material-icons">photo</i>Change Profile Photo</a>
+  </div>
+</main>
+<div class="linear-activity edit hide">
+  <div class="indeterminate"></div>
+</div>
+<div class="uploadProfile hide">
+  <form class="fileUpload" id="fileInfo">
+    <div class="inputWrapper">
+      <span class="title">Upload photo</span>
+      <i class="material-icons">file_upload</i>
+      <br />
+      <div>
+        <input type="file" id="fileUpload" name="fileUpload" accept="image/*" />
+        <label for="fileUpload" class="pointer">Choose a file</label>
+        <span>or drag & drop.</span>
+      </div>
+      <label id="cancelUpload" class="pointer">Cancel</label>
+    </div>
+    <div class="linear-activity hide">
+      <div class="indeterminate"></div>
+    </div>
+  </form>
+</div>
+<div id="userGallery">
+  <% if (artwork != false) { %>
+    <% for (let art of artwork) { %>
+      <a class="art shadow delink" href="/art/<%= art.id %>">
+        <div class="image" style="background-image: url('/artwork/thumbs/<%= art.id %>.jpg')"></div>
+        <div class="art-info">
+          <% if (art.visibility == 0) { %>
+            <span class="title"><%= art.title %> <i>unpublished</i></span>
+          <% } else { %>
+            <span class="title"><%= art.title %></span>
+          <% } %>
+        </div>
+      </a>
+    <% } %>
+  <% } %>
+</div>
+<script> var fullname = "<%= fullname %>"; var userID = "<%= userID %>"; var description = "<%= description %>"; </script>
+<script src="/assets/js/editUser.js"></script>
+<script src="/assets/js/user.js"></script>

@@ -94,7 +94,7 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
           galleryAPI.getArtwork(pool, req.body.artID, (art) => {
             if (art.status.code == 200) {
               if (art.data.owner == user.data.id) {
-                galleryAPI.deleteArtwork(pool, fs, art.data.id, art.data.filename, (response) => {
+                galleryAPI.deleteArtwork(pool, fs, art.data.id, (response) => {
                   res.setHeader('Content-Type', 'application/json');
                   res.send(JSON.stringify(response));
                 });
@@ -200,5 +200,53 @@ module.exports = function(app, pool, galleryAPI, fs, userAPI) {
         res.send(JSON.stringify(response));
       }
     });
+  });
+
+  app.post('/api/g/search', (req, res) => {
+    if (req.body.query == undefined) {
+      let response = {
+        status: {
+          code: 400,
+          message: "Bad request"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+      return;
+    }
+    galleryAPI.searchArtwork(pool, userAPI, req.body.query, (response) => {
+      if (response.status.code == 200 || response.status.code == 204) {
+        if (response.status.code == 204) response.data = {};
+        res.render('gallery/search', {artwork: response.data});
+      } else {
+        res.send('500');
+      }
+    });
+  });
+
+  app.post('/api/g/vote', (req, res) => {
+    if (req.body.artID == undefined) {
+      let response = {
+        status: {
+          code: 400,
+          message: "Bad request"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+      return;
+    }
+    userAPI.getUserByReq(pool, req, (user) => {
+      if (user.status.code == 200) {
+        galleryAPI.vote(pool, req.body.artID, user.data.id, (response) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(user));
+      }
+    });
+
   });
 }

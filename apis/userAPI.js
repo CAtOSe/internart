@@ -1,5 +1,8 @@
 const randomstring = require('randomstring');
 const permissions = require('./permissions');
+const devnull = require('dev-null');
+const sharp = require('sharp');
+const streamToBuffer = require('stream-to-buffer');
 
 module.exports.getUserByID = function (pool, userID, callback, returnPassword = false) {
   let query = 'SELECT id, email, fullName, groups, username, description FROM users WHERE id = $1';
@@ -91,7 +94,7 @@ module.exports.createUser = function (pool, userData, callback) {
         res.send(JSON.stringify(response));
         return;
       }else if(qres){
-        pool.query('INSERT INTO users(id, username, email, fullname, password, groups) VALUES ($1, $2, $3, $4, $5, $6)', [id, userData['username'], userData['email'], userData['fullName'], userData['password'], userData['groups']], (err, qres) => {
+        pool.query('INSERT INTO users(id, username, email, fullname, password, groups) VALUES ($1, $2, $3, $4, $5, $6)', [id, userData.username, userData.email, userData.fullname, userData.password, 'user'], (err, qres) => {
           if (err){
             if (err['detail'].includes('already exists')){
               let response = {
@@ -116,7 +119,10 @@ module.exports.createUser = function (pool, userData, callback) {
                 code: 201,
                 message: "User created"
               },
-              data: {userID: id}
+              data: {
+                userID: id,
+                username: userData.username
+              }
             };
             callback(response);
           }
@@ -294,4 +300,147 @@ module.exports.checkUserPermission = function (pool, user, permission, callback)
     };
     callback(response);
   }
+}
+
+module.exports.pushEdit = function (pool, data, callback) {
+  pool.query('UPDATE users SET fullname = $2, description = $3 WHERE id = $1', [data.id, data.fullname, data.description], (err, qres) => {
+    if (err) {
+      let response = {
+        status: {
+          code: 500,
+          message: 'SQL Error'
+        }
+      };
+      callback(response);
+    } else {
+      let response = {
+        status: {
+          code: 200,
+          message: 'User updated'
+        }
+      };
+      callback(response);
+    }
+  });
+
+  module.exports.uploadCancel = function (req, callback) {
+    req.busboy.on('file', (field, file, filename) => {
+      file.pipe(devnull());
+    });
+
+    req.busboy.on('finish', function(field){
+      callback();
+    });
+
+    req.pipe(req.busboy);
+  }
+}
+
+module.exports.uploadCover = (pool, fs, req, userID, callback) => {
+    let extension, type, fields = {}, errors = false;
+
+    function saveFile() {
+      return new Promise((resolve, reject) => {
+        req.busboy.on('file', (field, file, filename, encoding, mimetype) => {
+          extension = '.' + filename.split('.').pop();
+          type = mimetype.split('/')[0];
+          if (mimetype.includes('image')) {
+            streamToBuffer(file, function (err, buffer) {
+              sharp(buffer)
+              .withoutEnlargement(true)
+              .resize(undefined, 1080)
+              .jpeg({
+                quality: 100
+              })
+              .toFile('./users/covers/' + userID + '.jpg')
+              .then((i) => {
+                resolve(201);
+              });
+            });
+
+          } else {
+            file.pipe(devnull());
+            errors = true;
+            reject(500);
+          }
+        });
+      });
+    }
+
+    Promise.all([saveFile()]).then(function(values) {
+      if (values[0] == 201) {
+        let response = {
+          status: {
+            code: 201,
+            message: "Cover uplaoded"
+          }
+        }
+        callback(response);
+      } else {
+        let response = {
+          status: {
+            code: 500,
+            message: "Unknown error occured"
+          }
+        }
+        callback(response);
+      }
+    });
+
+    req.pipe(req.busboy);
+}
+
+module.exports.uploadProfile = (pool, fs, req, userID, callback) => {
+    let extension, type, fields = {}, errors = false;
+
+    function saveFile() {
+      return new Promise((resolve, reject) => {
+        req.busboy.on('file', (field, file, filename, encoding, mimetype) => {
+          extension = '.' + filename.split('.').pop();
+          type = mimetype.split('/')[0];
+          if (mimetype.includes('image')) {
+            streamToBuffer(file, function (err, buffer) {
+              sharp(buffer)
+              .withoutEnlargement(true)
+              .resize(1024, 1024)
+              .crop(sharp.strategy.center)
+              .jpeg({
+                quality: 100
+              })
+              .toFile('./users/avatars/' + userID + '.jpg')
+              .then((i) => {
+                resolve(201);
+              });
+            });
+
+          } else {
+            file.pipe(devnull());
+            errors = true;
+            reject(500);
+          }
+        });
+      });
+    }
+
+    Promise.all([saveFile()]).then(function(values) {
+      if (values[0] == 201) {
+        let response = {
+          status: {
+            code: 201,
+            message: "Profile photo uplaoded"
+          }
+        }
+        callback(response);
+      } else {
+        let response = {
+          status: {
+            code: 500,
+            message: "Unknown error occured"
+          }
+        }
+        callback(response);
+      }
+    });
+
+    req.pipe(req.busboy);
 }

@@ -27,13 +27,21 @@
           <span class="artist"><a class="delink" href="/u/<%= artwork.ownerID %>"><img src="/users/avatar/<%= artwork.ownerID %>" /><%= artwork.ownerName %></a></span>
         </div>
       </div>
-      <span class="votes"><i class="material-icons pointer">thumb_up</i><%= artwork.votes %></span>
+      <% if (voted == true) { %>
+        <span class="votes voted"><i class="material-icons">thumb_up</i><span><%= artwork.votes %></span></span>
+      <% } else { %>
+        <span class="votes"><i class="material-icons">thumb_up</i><span><%= artwork.votes %></span></span>
+      <% } %>
       <% if (!(artwork.description == null || artwork.description == "" || artwork.description == undefined)) { %>
         <span class="label">description</span>
         <p><%= artwork.description %></p>
       <% } %>
     </div>
   </main>
+  <script>
+    var artID = '<%= artwork.id %>';
+  </script>
+  <script src="/assets/js/art.js"></script>
   <% if (userID == artwork.ownerID) { %>
     <script>
       $('#edit').on('click', function() {

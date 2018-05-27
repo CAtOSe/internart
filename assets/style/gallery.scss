@@ -109,12 +109,21 @@ main#art {
     }
 
     .votes {
+      @extend %transition;
+      @extend .pointer;
+      @extend .not-selectable;
       margin: 10px 0px;
       font-size: 0.9em;
       color: $fgBlack1;
+      &.voted, &:hover {
+        color: $fgBlack;
+      }
       i {
         margin-right: 4px;
         vertical-align: bottom;
+      }
+      span {
+        display: inline;
       }
     }
 
@@ -137,6 +146,7 @@ main#upload1 {
 
   form.fileUpload {
     @extend %transition;
+    @extend .not-selectable;
     background: $bgWhite1;
     display: flex;
     flex-direction: column;

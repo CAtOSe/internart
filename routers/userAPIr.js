@@ -1,4 +1,4 @@
-module.exports = function(app, pool, userAPI) {
+module.exports = function(app, pool, userAPI, fs) {
 
   app.post('/api/u/getUser', (req, res) => {
     if(req.body.userID == undefined){
@@ -34,7 +34,7 @@ module.exports = function(app, pool, userAPI) {
 
 
   app.post('/api/u/createUser', (req, res) => {
-    if(req.body.userData == undefined){
+    if(req.body == undefined){
       let response = {
         status: {
           code: 400,
@@ -45,8 +45,12 @@ module.exports = function(app, pool, userAPI) {
       res.send(JSON.stringify(response));
       return;
     }
-    let userData = JSON.parse(req.body.userData);
-    userAPI.createUser(pool, userData, (response) => {
+    userAPI.createUser(pool, req.body, (response) => {
+      if (response.status.code == 201) {
+        req.session.userID = response.data.userID;
+        res.cookie('username', response.data.username);
+        res.cookie('id', response.data.userID);
+      }
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(response));
     });
@@ -159,4 +163,102 @@ module.exports = function(app, pool, userAPI) {
       res.send(JSON.stringify(response));
     }
   });
+
+  app.post('/api/u/editForm', (req, res) => {
+    userAPI.getUserByReq(pool, req, (user) => {
+      if (user.status.code == 200) {
+        res.render('user/editForm', {
+          userID: user.data.id,
+          fullname: user.data.fullname,
+          description: user.data.description,
+          artwork: false,
+          reqUser: req.session.userID
+        });
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(user));
+      }
+    });
+  });
+
+  app.post('/api/u/edit', (req, res) => {
+    if (req.body.id != undefined && req.body.fullname != undefined && req.body.description != undefined) {
+      userAPI.getUserByReq(pool, req, (user) => {
+        if (user.status.code == 200 && user.data.id == req.body.id) {
+          let data = {
+            id: req.body.id,
+            fullname: req.body.fullname,
+            description: req.body.description
+          };
+          userAPI.pushEdit(pool, data, (response) => {
+            res.setHeader('Content-Type', 'application/json');
+            res.send(JSON.stringify(response));
+          });
+        } else {
+          let response = {
+            status: {
+              code: 401,
+              message: "Unauthorized"
+            }
+          };
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        }
+      });
+    } else {
+      let response = {
+        status: {
+          code: 400,
+          message: "Bad request"
+        }
+      };
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(response));
+    }
+  });
+
+  app.post('/api/u/upload-cover/:userID', (req, res) => {
+    userAPI.getUserByReq(pool, req, (user) => {
+      if (user.status.code == 200 && user.data.id == req.params.userID) {
+        userAPI.uploadCover(pool, fs, req, user.data.id, (response) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      } else {
+        userAPI.uploadCancel(req, () => {
+          let response = {
+            status: {
+              code: 403,
+              message: "Unauthorized"
+            }
+          };
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      }
+    });
+  });
+
+  app.post('/api/u/upload-profile/:userID', (req, res) => {
+    userAPI.getUserByReq(pool, req, (user) => {
+      if (user.status.code == 200 && user.data.id == req.params.userID) {
+        userAPI.uploadProfile(pool, fs, req, user.data.id, (response) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      } else {
+        userAPI.uploadCancel(req, () => {
+          let response = {
+            status: {
+              code: 403,
+              message: "Unauthorized"
+            }
+          };
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(response));
+        });
+      }
+    });
+  });
+
 }

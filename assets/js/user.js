@@ -11,23 +11,30 @@ function resize(h, w){
   if (coverHeight > $(window).height()*0.5) {
     coverHeight = $(window).height()*0.5;
   }
-  if (coverHeight+$('.info').outerHeight() < $('.photo').outerHeight()) {
-    coverHeight = $('.photo').outerHeight() - $('.info').outerHeight();
+  if (coverHeight+$('.info:first').outerHeight() < $('.photo').outerHeight()) {
+    coverHeight = $('.photo').outerHeight() - $('.info:first').outerHeight();
   }
   $('.cover').height(coverHeight);
   if (isMobile()) {
     $('.photo').css('top', coverHeight/2);
+    $('.changePhoto').attr('style','');
+    $('.changePhoto').css('top', coverHeight/2);
   } else {
     $('.photo').attr('style','');
+    $('.changePhoto').attr('style','');
   }
   photoLoc = getLocation($('.photo'));
   if (!isMobile()) {
-    $('.info').attr('style','');
-    $('.info').css('paddingLeft', photoLoc.left + photoLoc.width);
+    $('.info:first').attr('style','');
+    $('.info:first').css('paddingLeft', photoLoc.left + photoLoc.width);
+    $('.changePhoto').css('marginLeft', photoLoc.left);
   } else {
-    $('.info').attr('style','');
-    $('.info').css('paddingTop', photoLoc.height - coverHeight/2);
+    $('.info:first').attr('style','');
+    $('.info:first').css('paddingTop', photoLoc.height - coverHeight/2);
   }
+  photoLoc = getLocation($('.photo'));
+  $('.changePhoto').width(photoLoc.width);
+  $('.changePhoto').height(photoLoc.height);
 }
 
 img.onload = function(){

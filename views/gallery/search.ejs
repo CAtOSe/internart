@@ -1,0 +1,20 @@
+<% if (Object.keys(artwork).length > 0) { %>
+  <div class="msg_search">
+    <span>Found <%= Object.keys(artwork).length %> results</span>
+  </div>
+  <main id="gallery_search">
+    <% for (let art of artwork) { %>
+      <a class="art shadow delink" href="/art/<%= art.id %>">
+        <div class="image" style="background-image: url('/artwork/thumbs/<%= art.id %>.jpg')"></div>
+        <div class="art-info">
+          <span class="title"><%= art.title %></span>
+          <span class="artist"><img src="/users/avatar/<%= art.ownerID %>" /><%= art.ownerName %></span>
+        </div>
+      </a>
+    <% } %>
+  </main>
+<% } else { %>
+  <div class="msg">
+    <span>No results found</span>
+  </div>
+<% } %>

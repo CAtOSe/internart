@@ -16,6 +16,9 @@
     <div class="cover" style="background-image: url('/users/cover/<%= userID %>');"></div>
     <div class="info">
       <span class="name"><%= fullname %></span>
+      <% if (reqUser == userID) { %>
+        <a class="delink edit"><i class="material-icons">edit</i></a>
+      <% } %>
       <div class="aboutme">
         <span>about me</span>
         <p>
@@ -31,7 +34,11 @@
         <a class="art shadow delink" href="/art/<%= art.id %>">
           <div class="image" style="background-image: url('/artwork/thumbs/<%= art.id %>.jpg')"></div>
           <div class="art-info">
-            <span class="title"><%= art.title %></span>
+            <% if (art.visibility == 0) { %>
+              <span class="title"><%= art.title %> <i>unpublished</i></span>
+            <% } else { %>
+              <span class="title"><%= art.title %></span>
+            <% } %>
           </div>
         </a>
       <% } %>
@@ -40,6 +47,13 @@
   <script>
     var userID = '<%= userID %>';
   </script>
+  <% if (reqUser == userID) { %>
+    <script>
+      $('a.edit').on('click', function() {
+        window.location.href = '/editUser';
+      });
+    </script>
+  <% } %>
   <script src="/assets/js/user.js"></script>
 </body>
 </html>

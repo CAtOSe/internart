@@ -6,6 +6,9 @@ $(function() {
       replacerClassName: 'colorPickerReplacer',
       move: function(color) {
         $('#art').css('backgroundColor', color.toHexString());
+      },
+      change: function(color) {
+        $('#art').css('backgroundColor', color.toHexString());
       }
   });
 });
@@ -38,23 +41,23 @@ saveBtn.on('click', function() {
 $('#deleteArtwork').on('click', function() {
   let delPop = popCustom($('#deleteArtwork'), 'bottom', 'right', '<div class="delConfirm"><span>Delete artwork?</span><div><button>Cancel</button><button id="delConfBtn">Delete</button></div></div>');
   $(document).click(function(evnt) {
-    if (evnt.target != $('#deleteArtwork')[0]) {
+    if (evnt.target == $('#deleteArtwork')[0]) {
+    } else if (evnt.target == $('#delConfBtn')[0]) {
+      $.ajax({
+        method: 'POST',
+        url: '/api/g/deleteArtwork',
+        data: {
+          artID: artID
+        }
+      }).done(function(data) {
+        if (data.status.code == 200) {
+          window.location.href = "/";
+        } else {
+          popMessage($('#deleteArtwork'), 'bottom', 'right', 'Unknown error occured', 10, 1500);
+        }
+      });
+    } else {
       removePopup(delPop.id);
     }
-  });
-  $('#delConfBtn').on('click', function() {
-    $.ajax({
-      method: 'POST',
-      url: '/api/g/deleteArtwork',
-      data: {
-        artID: artID
-      }
-    }).done(function(data) {
-      if (data.status.code == 200) {
-        window.location.href = "/";
-      } else {
-        popMessage($('#deleteArtwork'), 'bottom', 'right', 'Unknown error occured', 10, 1500);
-      }
-    });
   });
 });

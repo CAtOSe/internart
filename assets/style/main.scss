@@ -53,20 +53,21 @@ nav {
     font-weight: $fLight;
     display: flex;
     align-items: center;
+    color: $fgBlack1;
 
-    a:hover {
-      color: $fgBlack1;
-    }
-
-    a.loggedIn {
+    a, span {
       @extend %transition;
-      display: inline-flex;
-      align-items: center;
-      margin: 0px 12px;
+      @extend .pointer;
       color: $fgBlack1;
       &:hover, &:focus {
         color: $fgBlack;
       }
+    }
+
+    a.loggedIn {
+      display: inline-flex;
+      align-items: center;
+      margin: 0px 12px;
     }
 
     img {
@@ -75,8 +76,6 @@ nav {
       border-radius: 50%;
       margin-right: 8px;
     }
-
-    span { @extend .pointer; }
 
     @media (min-width: 100px) and (max-width: 480px) {
       .smallHide { display: none !important; }
@@ -123,6 +122,68 @@ nav {
 
       &:hover {
         background: $bgWhite2;
+      }
+    }
+  }
+}
+
+
+div.msg_search {
+  padding: 32px 0px 0px 32px;
+  font-size: 1.1em;
+  color: $fgBlack1;
+}
+
+main#gallery_search {
+  padding: 16px 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-auto-rows: 350px;
+  grid-gap: 20px;
+  @media (min-width: 100px) and (max-width: 480px) {
+    padding: 16px;
+    grid-template-columns: repeat(auto-fit, 100%);
+  }
+  .art {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    background: $bgWhite1;
+    cursor: pointer;
+
+    .image {
+      flex: 1;
+      background-position: center center;
+      background-size: cover;
+    }
+
+    .art-info {
+      display: grid;
+      height: auto;
+      padding: 10px 32px;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
+      grid-gap:10px;
+
+      span {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+
+      .title { font-weight: $fRegular; font-size: 1.2em; }
+      .artist {
+        font-weight: $fLight;
+        font-size: 1em;
+        line-height: 1.2em;
+        color: $fgBlack1;
+
+        img {
+          vertical-align: bottom;
+          height: 1.2em;
+          border-radius: 50%;
+          margin-right: 4px;
+        }
       }
     }
   }
