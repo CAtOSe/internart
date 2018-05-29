@@ -17,7 +17,7 @@ $(function(){
   if (readCookie('username') != undefined) {
     $('nav span#userBar span.loggedIn').html(readCookie('username'));
     $('.loggedIn').removeClass('hide');
-    $('img').attr('src', '/users/avatar/' + readCookie('id'));
+    $('nav img').attr('src', '/users/avatar/' + readCookie('id'));
     $('nav span#userBar div#loginBar').addClass('hide');
     $('nav span#userBar').on('click', function(e){
         if ($('.userBarExt').length == 0) {
