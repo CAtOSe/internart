@@ -127,7 +127,9 @@ main#art {
         @extend .pointer;
         margin-right: 4px;
         vertical-align: bottom;
-        &:hover { color: $fgBlack; }
+        &.hover {
+          &:hover { color: $fgBlack; }
+        }
       }
       span {
         display: inline;

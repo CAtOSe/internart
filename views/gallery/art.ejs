@@ -31,9 +31,9 @@
         </div>
       </div>
       <% if (voted == true) { %>
-        <span class="votes voted"><i class="material-icons">thumb_up</i><span><%= artwork.votes %></span></span>
+        <span class="votes voted"><i class="material-icons hover">thumb_up</i><span><%= artwork.votes %></span></span>
       <% } else { %>
-        <span class="votes"><i class="material-icons">thumb_up</i><span><%= artwork.votes %></span></span>
+        <span class="votes"><i class="material-icons hover">thumb_up</i><span><%= artwork.votes %></span></span>
       <% } %>
       <% if (!(artwork.description == null || artwork.description == "" || artwork.description == undefined)) { %>
         <span class="label">description</span>
