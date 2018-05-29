@@ -1,3 +1,4 @@
+const PORT = 80;
 const args = process.argv.slice(2);
 const express = require('express');
 const session = require('express-session');
@@ -72,6 +73,6 @@ app.all('*', (req, res) => {
   res.status(404).send("404");
 });
 
-app.listen(80, (req, res) => {
+app.listen(PORT, (req, res) => {
   console.log("Listening");
 });
