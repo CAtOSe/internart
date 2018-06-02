@@ -4,7 +4,7 @@ InternArt
 ---
 Running:
 ```
-$ node app.js <database host> <database user> <database password>
+$ npm run
 ```
 
 ---

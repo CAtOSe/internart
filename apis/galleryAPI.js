@@ -138,8 +138,9 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
               if (mimetype.includes('image')) {
                 streamToBuffer(file, function (err, buffer) {
                   sharp(buffer)
-                  .withoutEnlargement(true)
-                  .resize(undefined, 720)
+                  .resize(undefined, 720, {
+                    withoutEnlargement: true
+                  })
                   .jpeg({
                     quality: 60
                   })
@@ -178,7 +179,7 @@ module.exports.uploadArtwork = (pool, fs, req, data, callback) => {
             req.busboy.on('finish', function(field){
               if (!errors) {
                 let date  = new Date();
-                pool.query('INSERT INTO artwork(id, type, owner, title, date, bgcolor, votes) VALUES ($1, $2, $3, $4, $5, $6, $7)', [id, type, data[0], 'Untitled Artwork', date.toISOString(), 'eeeeee', 0], (err, qres) => {
+                pool.query('INSERT INTO artwork(id, type, owner, title, date, bgcolor, votes, votes_users) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [id, type, data[0], 'Untitled Artwork', date.toISOString(), 'eeeeee', 0, ''], (err, qres) => {
                   if (err) {
                     if (err['detail'].includes('already exists')){
                       let response = 302;
@@ -322,6 +323,7 @@ module.exports.canEdit = function (pool, req, artID, userAPI, callback) {
           }
         };
         callback(response);
+        throw err;
       } else {
         let response = {
           status: {

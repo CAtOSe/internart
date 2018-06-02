@@ -2,3 +2,4 @@ node_modules/
 artwork/
 users/avatars/
 users/covers/
+.env

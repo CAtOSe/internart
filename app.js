@@ -1,5 +1,4 @@
-const PORT = 80;
-const args = process.argv.slice(2);
+require('dotenv').config()
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -23,11 +22,11 @@ app.use(busboy());
 app.use(cookieParser());
 
 const pool = new Pool({
-  user: args[1],
-  host: args[0],
-  password: args[2],
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  password: process.env.DB_PASS,
   database: 'internart',
-  port: '5432'
+  port: process.env.DB_PORT
 });
 
 pool.on('error', (err, client) => {
@@ -38,9 +37,9 @@ pool.on('error', (err, client) => {
 app.use(session({
   store: new pgSession({
     pool : pool,                // Connection pool
-    tableName : 'user_sessions'   // Use another table-name than the default "session" one
+    tableName : 'user_session'
   }),
-  secret: 'ilovepc',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   secure: true
@@ -73,6 +72,6 @@ app.all('*', (req, res) => {
   res.status(404).send("404");
 });
 
-app.listen(PORT, (req, res) => {
+app.listen(process.env.PORT, (req, res) => {
   console.log("Listening");
 });

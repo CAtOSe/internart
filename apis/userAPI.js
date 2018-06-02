@@ -91,9 +91,8 @@ module.exports.createUser = function (pool, userData, callback) {
           },
           error: err
         };
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(response));
-        return;
+        callback(response);
+        throw err;
       }else if(qres){
         bcrypt.genSalt(12, function(err, salt) {
           bcrypt.hash(userData.password, salt, function(err, hash) {
@@ -354,8 +353,7 @@ module.exports.uploadCover = (pool, fs, req, userID, callback) => {
           if (mimetype.includes('image')) {
             streamToBuffer(file, function (err, buffer) {
               sharp(buffer)
-              .withoutEnlargement(true)
-              .resize(undefined, 1080)
+              .resize(undefined, 1080, { withoutEnlargement: true })
               .jpeg({
                 quality: 100
               })
@@ -408,9 +406,7 @@ module.exports.uploadProfile = (pool, fs, req, userID, callback) => {
         if (mimetype.includes('image')) {
           streamToBuffer(file, function (err, buffer) {
             sharp(buffer)
-            .withoutEnlargement(true)
-            .resize(1024, 1024)
-            .crop(sharp.strategy.center)
+            .resize(1024, 1024, { withoutEnlargement: true })
             .jpeg({
               quality: 100
             })
